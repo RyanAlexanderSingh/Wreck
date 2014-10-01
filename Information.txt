@@ -1,6 +1,0 @@
-Wreck
-=====
-
-Coursework for Introduction to Game Programming 
-
-Game Idea and objectives!
