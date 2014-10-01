@@ -35,8 +35,8 @@ namespace octet { namespace resources {
         value = new_prefix;
       } else if (value == NULL) {
         // if the prefix is not set, try to find the root directory by opening README.txt
-        const char *rme = "../../../../README.txt";
-        const char *pfx = "../../../../";
+        const char *rme = "../../../README.txt";
+        const char *pfx = "../../../";
         for (int i = 0; i != 5; ++i) {
           FILE *test = fopen(rme + i * 3, "rb");
           if (test) {
