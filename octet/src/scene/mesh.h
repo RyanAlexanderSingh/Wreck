@@ -919,6 +919,7 @@ namespace octet { namespace scene {
         unsigned vsize = dest_vertices.size() * sizeof(uint8_t);
         gl_resource *indices = get_indices();
         gl_resource *vertices = new gl_resource(GL_ARRAY_BUFFER, vsize);
+		indices->unlock_read_only();											/// LINE ADDED BY JUANMI
         indices->assign(&dest_indices[0], 0, isize);
         vertices->assign(&dest_vertices[0], 0, vsize);
 
