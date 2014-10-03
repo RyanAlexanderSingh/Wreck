@@ -10,6 +10,7 @@ namespace octet {
 		// scene for drawing box
 		ref<visual_scene> app_scene;
 
+    car Car;
 		btDefaultCollisionConfiguration config;       /// setup for the world
 		btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
 		btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
@@ -91,6 +92,17 @@ namespace octet {
 			add_box(modelToWorld, vec3(5.0f), floor_mat);
 		}
 
+    void movecam()
+    {
+      if (is_key_down(key_up))
+      {
+        app_scene->get_camera_instance(0)->get_node()->translate(vec3(0,0,-1));
+      }
+      if (is_key_down(key_down))
+      {
+        app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1));
+      }
+    }
 		/// this is called to draw the world
 		void draw_world(int x, int y, int w, int h) {
       moveBox();
@@ -98,6 +110,7 @@ namespace octet {
 			get_viewport_size(vx, vy);
 			app_scene->begin_render(vx, vy);
 
+      movecam();
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
 				btRigidBody *rigid_body = rigid_bodies[i];
