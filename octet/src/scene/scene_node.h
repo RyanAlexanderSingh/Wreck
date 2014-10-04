@@ -124,7 +124,7 @@ namespace octet { namespace scene {
 
     /// Scale the matrix
     void scale(vec3_in xyz) {
-      nodeToParent.scale(xyz[0], xyz[1], xyz[2]);
+		nodeToParent.scale(xyz[0], xyz[1], xyz[2]); 
     }
 
     /// Get the identifying sid

@@ -296,7 +296,7 @@ namespace octet { namespace scene {
         scene_node *node = add_scene_node();
         camera_instance *cam = new camera_instance();
         float bb_size = length(bb.get_half_extent()) * 2.0f;
-        float distance = max(bb.get_max().z(), bb_size) * 2;
+        float distance = max(bb.get_max().z(), bb_size) * 20;
         node->access_nodeToParent().translate(0, 0, distance);
         float f = distance * 2, n = f * 0.001f;
         cam->set_node(node);
