@@ -149,15 +149,15 @@ namespace octet {
       static WNDCLASSW wndclass = {
         CS_HREDRAW | CS_VREDRAW, DefWindowProc, 0, 0, instance,
         icon, cursor, brush, 0, L"MyClass"
-      };
+	  };
       RegisterClassW (&wndclass);
 
       gl_context = 0;
-	  DWORD dwStyle = (WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
-      window_handle = CreateWindowW(L"MyClass", L"Wreck",
-		  dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
+	  DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;           // Window Extended Style
+	  DWORD dwStyle = (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX); //Window Style
+      window_handle = CreateWindowEx(dwExStyle, L"MyClass", L"Wreck", dwStyle,  CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
-      );
+		);
 
       map()[window_handle] = this;
 
@@ -290,7 +290,7 @@ namespace octet {
         }
 
         // waste some time. (do not do this in real games!)
-        Sleep(1000/30);
+        //Sleep(1000/30);
 
         for (int i = 0; i != m.size(); ++i) {
           // note: because Win8 generates an invisible window, we need to check m.value(i)
