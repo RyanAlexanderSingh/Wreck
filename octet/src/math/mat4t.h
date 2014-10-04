@@ -23,7 +23,7 @@
 //
 namespace octet { namespace math {
   /// 4x4 Matrix class
-  class mat4t {
+  class mat4t { 
     // these vectors are the x, y, z, w components. w is the translation.
     vec4 v[4];
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2012-2014"; }
