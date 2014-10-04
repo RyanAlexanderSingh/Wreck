@@ -10,7 +10,7 @@ namespace octet {
 		// scene for drawing box
 		ref<visual_scene> app_scene;
 
-    car Car;
+		car Car;
 		btDefaultCollisionConfiguration config;       /// setup for the world
 		btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
 		btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
@@ -19,6 +19,13 @@ namespace octet {
 
 		dynarray<btRigidBody*> rigid_bodies;
 		dynarray<scene_node*> nodes;
+		scene_node *sceneCamera;
+
+		float distance;
+		bool was_mouse_down;
+		int prev_x;
+		int prev_y;
+		float sensitivity;
 
 		void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
 
@@ -53,6 +60,8 @@ namespace octet {
 			broadphase = new btDbvtBroadphase();
 			solver = new btSequentialImpulseConstraintSolver();
 			world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, &config);
+			was_mouse_down = false;
+			sensitivity = 200;
 		}
 
 		~ryan() {
@@ -66,8 +75,9 @@ namespace octet {
 		void app_init() {
 			app_scene = new visual_scene();
 			app_scene->create_default_camera_and_lights();
-			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 5, 0));
-
+			sceneCamera = app_scene->get_camera_instance(0)->get_node();
+			sceneCamera->translate(vec3(0, 5, 0));
+			
 			mat4t modelToWorld;
 			material *floor_mat = new material(vec4(0, 1, 3, 1));
 
@@ -78,11 +88,11 @@ namespace octet {
 			modelToWorld.translate(-4.5f, 10.0f, 0);
 			material *mat = new material(vec4(0, 1, 0, 1));
       //affects performance depending on size!
-      math::random rand;
+			math::random rand;
 			for (int i = 0; i != 20; ++i) {
 				modelToWorld.translate(3, 0, 0);
 				modelToWorld.rotateZ(360 / 20);
-        float size = rand.get(0.1f, 1.0f);
+				float size = rand.get(0.1f, 1.0f);
 				add_box(modelToWorld, vec3(size), mat);
 			}
 
@@ -92,25 +102,14 @@ namespace octet {
 			add_box(modelToWorld, vec3(5.0f), floor_mat);
 		}
 
-    void movecam()
-    {
-      if (is_key_down(key_up))
-      {
-        app_scene->get_camera_instance(0)->get_node()->translate(vec3(0,0,-1));
-      }
-      if (is_key_down(key_down))
-      {
-        app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1));
-      }
-    }
 		/// this is called to draw the world
 		void draw_world(int x, int y, int w, int h) {
-      moveBox();
+			simulate();
 			int vx = 0, vy = 0;
 			get_viewport_size(vx, vy);
 			app_scene->begin_render(vx, vy);
+			
 
-      movecam();
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
 				btRigidBody *rigid_body = rigid_bodies[i];
@@ -127,15 +126,49 @@ namespace octet {
 
 			// draw the scene
 			app_scene->render((float)vx / vy);
-		}
 
-    void moveBox(){
-      const float ship_speed = 0.05f;
-      // left and right arrows
-      if (is_key_down(key_left)) {
-      }
-      else if (is_key_down(key_right)) {
-      }
-    }
+			bool is_mouse_down = is_key_down(key_lmb);
+			if (is_mouse_down) {
+				int x = 0, y = 0;
+				get_mouse_pos(x, y);
+				if (was_mouse_down){
+					vec3 rotate_pos = (x, y, 0);
+					sceneCamera->rotate(0, rotate_pos);
+				}
+			}
+			was_mouse_down = is_mouse_down;
+			}
+
+		///
+		void simulate()
+		{
+			moveCamera();
+			moveCar();
+		}
+		
+		///
+		void moveCar(){
+			//const float ship_speed = 0.05f;
+			// movement keys
+			if (is_key_down(key_a) || is_key_down(key_left)) {
+				sceneCamera->translate(vec3(-1, 0, 0));
+			  }
+			if (is_key_down(key_d) || is_key_down(key_right)) {
+				sceneCamera->translate(vec3(1, 0, 0));
+			  }
+			if (is_key_down(key_w) || is_key_down(key_up))
+			  {
+				sceneCamera->translate(vec3(0, 0, -1));
+			  }
+			if (is_key_down(key_s) || is_key_down(key_down))
+			  {
+				sceneCamera->translate(vec3(0, 0, 1));
+			  }
+			}
+
+		///
+		void moveCamera()
+		{
+		}
 	};
 }
