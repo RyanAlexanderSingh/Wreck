@@ -131,12 +131,9 @@ namespace octet {
 			if (is_mouse_down) {
 				int x = 0, y = 0;
 				get_mouse_pos(x, y);
-				if (was_mouse_down){
 					vec3 rotate_pos = (x, y, 0);
 					sceneCamera->rotate(0, rotate_pos);
 				}
-			}
-			was_mouse_down = is_mouse_down;
 			}
 
 		///
@@ -169,6 +166,14 @@ namespace octet {
 		///
 		void moveCamera()
 		{
+			bool is_mouse_down = is_key_down(key_lmb);
+			if (is_mouse_down)
+			{
+				int x = 0, y = 0;
+				int vx = 0, vy = 0;
+				get_mouse_pos(x, y);
+				get_viewport_size(vx, vy); 
+			}
 		}
 	};
 }

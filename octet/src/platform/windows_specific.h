@@ -153,9 +153,9 @@ namespace octet {
       RegisterClassW (&wndclass);
 
       gl_context = 0;
-     
-      window_handle = CreateWindowW(L"MyClass", L"octet",
-        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
+	  DWORD dwStyle = (WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+      window_handle = CreateWindowW(L"MyClass", L"Wreck",
+		  dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
       );
 

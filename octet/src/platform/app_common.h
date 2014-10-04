@@ -33,6 +33,10 @@ namespace octet {
     key_tab = 9,
     key_esc = 27,
     key_space = 32,
+	key_w = 87,
+	key_a = 65,
+	key_s = 83,
+	key_d = 68,
 
     // other keys have the following codes:
     key_f1 = 0x80,
@@ -60,6 +64,8 @@ namespace octet {
     key_shift,
     key_ctrl,
     key_alt,
+	
+
 
     // mouse buttons
     key_lmb,
@@ -69,6 +75,7 @@ namespace octet {
 
   class app_common {
     unsigned char keys[256];
+	int key_pressed;
     int mouse_x;
     int mouse_y;
     int mouse_wheel;
@@ -100,6 +107,7 @@ namespace octet {
     bool is_key_down(unsigned key) {
       return keys[key & 0xff] == 1;
     }
+
 
     void get_mouse_pos(int &x, int &y) {
       x = mouse_x;
