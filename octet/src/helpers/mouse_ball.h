@@ -28,7 +28,7 @@ namespace octet { namespace helpers {
     }
 
     void update(mat4t &cameraToWorld) {
-      bool is_mouse_down = the_app->is_key_down(key_lmb) && the_app->is_key_down(key_alt);
+      bool is_mouse_down = the_app->is_key_down(key_lmb);
       if (is_mouse_down) {
         int x = 0, y = 0;
         int vx = 0, vy = 0;

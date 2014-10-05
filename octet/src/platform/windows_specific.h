@@ -154,7 +154,7 @@ namespace octet {
 
       gl_context = 0;
 	  DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;           // Window Extended Style
-	  DWORD dwStyle = (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX); //Window Style
+    DWORD dwStyle = (WS_OVERLAPPED | WS_MAXIMIZE); //Window Style
       window_handle = CreateWindowEx(dwExStyle, L"MyClass", L"Wreck", dwStyle,  CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
 		);
@@ -171,7 +171,8 @@ namespace octet {
       set_viewport_size(rect.right - rect.left, rect.bottom - rect.top);
 
       app_init();
-
+  
+      SetWindowLong(window_handle, GWL_STYLE, 0); // remove all window styles such as borders
       ShowWindow (window_handle, SW_SHOW);
       UpdateWindow (window_handle);
     }
@@ -290,7 +291,7 @@ namespace octet {
         }
 
         // waste some time. (do not do this in real games!)
-        //Sleep(1000/30);
+        Sleep(1000/30);
 
         for (int i = 0; i != m.size(); ++i) {
           // note: because Win8 generates an invisible window, we need to check m.value(i)
