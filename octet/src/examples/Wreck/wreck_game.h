@@ -11,7 +11,7 @@ namespace octet {
 		ref<visual_scene> app_scene;
 
 		car Car;
-    mouse_ball mouseBall;
+        mouse_ball mouseBall;
 		btDefaultCollisionConfiguration config;       /// setup for the world
 		btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
 		btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
@@ -20,7 +20,6 @@ namespace octet {
 
 		dynarray<btRigidBody*> rigid_bodies;
 		dynarray<scene_node*> nodes;
-	    camera_instance *camera;
 		scene_node *cameraNode;
 		
 
@@ -79,22 +78,20 @@ namespace octet {
 
 		/// this is called once OpenGL is initialized
 		void app_init() {
-			
+
+			//load the scene and camera
 			app_scene = new visual_scene();
 			app_scene->create_default_camera_and_lights();
 			app_scene->get_camera_instance(0)->set_far_plane(20000);
 			app_scene->get_camera_instance(0)->set_near_plane(1);
-			camera = app_scene->get_camera_instance(0);
-			cameraNode = camera->get_node();
+			cameraNode = app_scene->get_camera_instance(0)->get_node();
 			mat4t cameraToWorld = cameraNode->get_nodeToParent();
-			cameraNode->translate(vec3(0, 5, 0));
-			mouseBall.init(this, cameraToWorld.w().length(), 360.0f);
+			cameraNode->translate(vec3(0, 0, 0));
+			printf("%f",cameraToWorld.w().length());
+			mouseBall.init(this, cameraToWorld.w().length(), 360.0f); 
 
 			mat4t modelToWorld;
 			material *floor_mat = new material(vec4(1, 2, 1, 3));
-
-      //load the camera and scene
-      load_scene();
 
 			// add the ground (as a static object)
 			add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
