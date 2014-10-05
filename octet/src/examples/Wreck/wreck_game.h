@@ -9,9 +9,9 @@ namespace octet {
 	class wreck_game : public app {
 		// scene for drawing box
 		ref<visual_scene> app_scene;
-    
-    mouse_ball mouseBall;
+
 		car Car;
+    mouse_ball mouseBall;
 		btDefaultCollisionConfiguration config;       /// setup for the world
 		btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
 		btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
@@ -20,7 +20,9 @@ namespace octet {
 
 		dynarray<btRigidBody*> rigid_bodies;
 		dynarray<scene_node*> nodes;
-
+    camera_instance *camera;
+		scene_node *cameraNode;
+		mat4t cameraMatrix;
 
 		float distance;
 		bool was_mouse_down;
@@ -29,8 +31,17 @@ namespace octet {
 		float sensitivity;
 		float angleX;
 
-
-
+    void load_scene()
+    {
+      app_scene = new visual_scene();
+      app_scene->create_default_camera_and_lights();
+      app_scene->get_camera_instance(0)->set_far_plane(20000);
+      app_scene->get_camera_instance(0)->set_near_plane(1);
+      camera_instance *camera = app_scene->get_camera_instance(0);
+      scene_node *cameraNode = camera->get_node();
+      mat4t cameraToWorld = cameraNode->get_nodeToParent();
+      mouseBall.init(this, cameraToWorld.w.length(), 360.0f);
+    }
 		void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
 
 			btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
@@ -56,17 +67,14 @@ namespace octet {
 
 			app_scene->add_child(node);
 			app_scene->add_mesh_instance(new mesh_instance(node, box, mat));
-
 		}
 	public:
 		/// this is called when we construct the class before everything is initialised.
-		wreck_game(int argc, char **argv) : app(argc, argv) {
+		wreck_game(int argc, char **argv) : app(argc, argv), mouseBall(){
 			dispatcher = new btCollisionDispatcher(&config);
 			broadphase = new btDbvtBroadphase();
 			solver = new btSequentialImpulseConstraintSolver();
 			world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, &config);
-			was_mouse_down = false;
-			sensitivity = 200;
 		}
 
 		~wreck_game() {
@@ -78,21 +86,15 @@ namespace octet {
 
 		/// this is called once OpenGL is initialized
 		void app_init() {
-
-      app_scene = new visual_scene();
-      app_scene->create_default_camera_and_lights();
-      app_scene->get_camera_instance(0)->set_far_plane(20000);
-      app_scene->get_camera_instance(0)->set_near_plane(1);
-      
-      mouseBall.init(this, 10, 200);
 			
-			cameraNode = app_scene->get_camera_instance(0)->get_node();
-			cameraNode->translate(vec3(0, 5, 0));
-
-      camera = app_scene->get_camera_instance(0);
+			//cameraNode->translate(vec3(0, 5, 0));
 
 			mat4t modelToWorld;
-			material *floor_mat = new material(vec4(0, 2, 3, 3));
+			material *floor_mat = new material(vec4(1, 2, 1, 3));
+
+      //load the camera and scene
+      load_scene();
+
 			// add the ground (as a static object)
 			add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
@@ -112,54 +114,14 @@ namespace octet {
 			modelToWorld.loadIdentity();
 			modelToWorld.translate(0, 200, 0);
 			add_box(modelToWorld, vec3(5.0f), floor_mat);
-
-      distance = 5;
 		}
-
-
 
 		/// this is called to draw the world
 		void draw_world(int x, int y, int w, int h) {
 			simulate();
-
 			int vx = 0, vy = 0;
 			get_viewport_size(vx, vy);
 			app_scene->begin_render(vx, vy);
-
-      mat4t cameraToWorld = cameraNode->calcModelToWorld();
-      //update(cameraToWorld);
-      mouseBall.update(cameraToWorld);
-      app_scene->get_camera_instance(0)->set_cameraToWorld(cameraToWorld, (float)vx / vy);
-   
-      
-      bool is_mouse_down = is_key_down(key_lmb) && is_key_down(key_alt);
-      if (is_mouse_down) {
-        int x = 0, y = 0;
-        int vx = 0, vy = 0;
-        get_mouse_pos(x, y);
-        get_viewport_size(vx, vy);
-        if (was_mouse_down && vx && vy) {
-          // spin the camera around the target
-          float cx = vx * 0.5f;
-          float cy = vy * 0.5f;
-          float pfx = (prev_x - cx) / vx;
-          float pfy = (prev_y - cy) / vy;
-          float fx = (x - cx) / vx;
-          float fy = (y - cy) / vy;
-          vec4 dxy(pfy - fy, pfx - fx, 0, 0);
-          float len2 = dxy.squared();
-          if (len2 > 0) {
-            vec4 norm = dxy.normalize();
-            vec3 cameraNorm = (norm.x(), norm.y(), 0);
-            cameraToWorld.translate(0, 0, -distance);
-            cameraToWorld.rotate(sqrtf(len2) * sensitivity, norm.x(), norm.y(), 0);
-            cameraToWorld.translate(0, 0, distance);
-          }
-        }
-        prev_x = x;
-        prev_y = y;
-      }
-      was_mouse_down = is_mouse_down;
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
@@ -171,54 +133,26 @@ namespace octet {
 				modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);
 				nodes[i]->access_nodeToParent() = modelToWorld;
 			}
-			// update matrices. assume 30 fps.
-			app_scene->update(1.0f / 30);
+
+      camera_instance *camera = app_scene->get_camera_instance(0);
+      scene_node *cameraNode = camera->get_node();
+      mat4t &cameraToWorld = cameraNode->access_nodeToParent();
+      mouseBall.update(cameraToWorld);
+
+      // update matrices. assume 30 fps.
+      app_scene->update(1.0f / 30);
 
 			// draw the scene
-			app_scene->render((float)vx / vy);
+      app_scene->render(*camera, (float) vx / vy);
+			//app_scene->render((float)vx / vy);
 		}
-    
-    ///move the camera around when the left mouse button is down
-    void update(mat4t &cameraToWorld){
-    distance = 5;
-      bool is_mouse_down = is_key_down(key_lmb) && is_key_down(key_alt);
-      if (is_mouse_down) {
-        int x = 0, y = 0;
-        int vx = 0, vy = 0;
-        get_mouse_pos(x, y);
-        get_viewport_size(vx, vy);
-        if (was_mouse_down && vx && vy) {
-          // spin the camera around the target
-          float cx = vx * 0.5f;
-          float cy = vy * 0.5f;
-          float pfx = (prev_x - cx) / vx;
-          float pfy = (prev_y - cy) / vy;
-          float fx = (x - cx) / vx;
-          float fy = (y - cy) / vy;
-          vec4 dxy(pfy - fy, pfx - fx, 0, 0);
-          float len2 = dxy.squared();
-          if (len2 > 0) {
-            vec4 norm = dxy.normalize();
-            vec3 cameraNorm = (norm.x(), norm.y(), 0);
-            cameraToWorld.translate(0, 0, -distance);
-            cameraToWorld.rotate(sqrtf(len2) * sensitivity, norm.x(), norm.y(), 0);
-            cameraToWorld.translate(0, 0, distance);
-          }
-        }
-        prev_x = x;
-        prev_y = y;
-      }
-      was_mouse_down = is_mouse_down;
-    }
 		///
 		void simulate()
 		{
-      //moveCamera();
 			moveCar();
       keyboardInputs();
 		}
 
-	
 		///
 		void moveCar(){
 			//const float ship_speed = 0.05f;
@@ -239,6 +173,7 @@ namespace octet {
 			}
 		}
 
+    ///any random keyboard functions such as esc to close the game
     void keyboardInputs()
     {
       if (is_key_down(key_esc))
@@ -246,6 +181,5 @@ namespace octet {
         exit(1);
       }
     }
-
 	};
 }

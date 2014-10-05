@@ -18,11 +18,9 @@
 int main(int argc, char **argv) {
 	// set up the platform.
 	octet::app::init_all(argc, argv);
-
 	// our application.
 	octet::wreck_game app(argc, argv);
 	app.init();
-
 	// open windows
 	octet::app::run_all_apps();
 }
