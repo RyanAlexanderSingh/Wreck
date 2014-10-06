@@ -132,16 +132,14 @@ namespace octet {
 				nodes[i]->access_nodeToParent() = modelToWorld;
 			}
 
-      camera_instance *camera = app_scene->get_camera_instance(0);
-      scene_node *cameraNode = camera->get_node();
-      mat4t &cameraToWorld = cameraNode->access_nodeToParent();
-      mouseBall.update(cameraToWorld);
+      scene_node *camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent;
+      mouseBall.update(cameraNode->access_nodeToParent());
 
       // update matrices. assume 30 fps.
       app_scene->update(1.0f / 30);
 
 			// draw the scene
-      app_scene->render(*camera, (float) vx / vy);
+      app_scene->render((float) vx / vy);
 			//app_scene->render((float)vx / vy);
 		}
 		///
