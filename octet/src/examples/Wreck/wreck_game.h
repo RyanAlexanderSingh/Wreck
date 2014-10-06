@@ -11,7 +11,7 @@ namespace octet {
 		ref<visual_scene> app_scene;
 
 		car Car;
-        mouse_ball mouseBall;
+    mouse_ball mouseBall;
 		btDefaultCollisionConfiguration config;       /// setup for the world
 		btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
 		btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
@@ -21,19 +21,9 @@ namespace octet {
 		dynarray<btRigidBody*> rigid_bodies;
 		dynarray<scene_node*> nodes;
 		scene_node *cameraNode;
-		
 
-		float distance;
-		bool was_mouse_down;
-		int prev_x;
-		int prev_y;
 		float sensitivity;
-		float angleX;
 
-    void load_scene()
-    {
-     
-    }
 		void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
 
 			btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
@@ -85,10 +75,8 @@ namespace octet {
 			app_scene->get_camera_instance(0)->set_far_plane(20000);
 			app_scene->get_camera_instance(0)->set_near_plane(1);
 			cameraNode = app_scene->get_camera_instance(0)->get_node();
-			mat4t cameraToWorld = cameraNode->get_nodeToParent();
-			cameraNode->translate(vec3(0, 0, 0));
-			printf("%f",cameraToWorld.w().length());
-			mouseBall.init(this, cameraToWorld.w().length(), 360.0f); 
+			
+			//mouseBall.init(this, cameraToWorld.w().length(), 360.0f); 
 
 			mat4t modelToWorld;
 			material *floor_mat = new material(vec4(1, 2, 1, 3));
@@ -116,10 +104,20 @@ namespace octet {
 
 		/// this is called to draw the world
 		void draw_world(int x, int y, int w, int h) {
-			simulate();
+     
+      
 			int vx = 0, vy = 0;
 			get_viewport_size(vx, vy);
 			app_scene->begin_render(vx, vy);
+      int mx = 0, my = 0;
+      get_mouse_pos(mx,my);
+
+      mat4t &cam = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
+      cam.loadIdentity();
+      cam.rotateX(float(mx));
+      cam.rotateY(float(my));
+      simulate();
+
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
@@ -132,15 +130,11 @@ namespace octet {
 				nodes[i]->access_nodeToParent() = modelToWorld;
 			}
 
-      scene_node *camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent;
-      mouseBall.update(cameraNode->access_nodeToParent());
-
       // update matrices. assume 30 fps.
       app_scene->update(1.0f / 30);
 
 			// draw the scene
       app_scene->render((float) vx / vy);
-			//app_scene->render((float)vx / vy);
 		}
 		///
 		void simulate()

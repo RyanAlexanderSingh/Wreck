@@ -435,9 +435,6 @@ namespace octet { namespace scene {
     void render(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam, float aspect_ratio) {
       render_impl(object_shader, skin_shader, cam, aspect_ratio);
     }
-    void render(camera_instance &cam, float aspect_ratio) {
-      render_impl(*object_shader, *skin_shader, cam, aspect_ratio);
-    }
 
     /// render using default shaders.
     void render(float aspect_ratio) {

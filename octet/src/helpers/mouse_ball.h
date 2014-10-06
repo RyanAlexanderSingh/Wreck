@@ -47,7 +47,7 @@ namespace octet { namespace helpers {
           if (len2 > 0) {
             vec4 norm = dxy.normalize();
             cameraToWorld.translate(0, 0, -distance);
-            cameraToWorld.rotate(sqrtf(len2) * sensitivity, norm.x(), norm.y(), 0);
+            cameraToWorld.rotate(sqrtf(len2) * sensitivity, norm.x(), norm.y(),  0);
             cameraToWorld.translate(0, 0, distance);
           }
 
