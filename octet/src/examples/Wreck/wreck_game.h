@@ -10,8 +10,6 @@ namespace octet {
 		// scene for drawing box
 		ref<visual_scene> app_scene;
 
-		car Car;
-    mouse_ball mouseBall;
 		btDefaultCollisionConfiguration config;       /// setup for the world
 		btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
 		btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
@@ -21,6 +19,7 @@ namespace octet {
 		dynarray<btRigidBody*> rigid_bodies;
 		dynarray<scene_node*> nodes;
 		scene_node *cameraNode;
+		scene_node *vehicle;
 
 		float sensitivity;
 
@@ -50,9 +49,10 @@ namespace octet {
 			app_scene->add_child(node);
 			app_scene->add_mesh_instance(new mesh_instance(node, box, mat));
 		}
+
 	public:
 		/// this is called when we construct the class before everything is initialised.
-		wreck_game(int argc, char **argv) : app(argc, argv), mouseBall(){
+		wreck_game(int argc, char **argv) : app(argc, argv){
 			dispatcher = new btCollisionDispatcher(&config);
 			broadphase = new btDbvtBroadphase();
 			solver = new btSequentialImpulseConstraintSolver();
@@ -75,14 +75,21 @@ namespace octet {
 			app_scene->get_camera_instance(0)->set_far_plane(20000);
 			app_scene->get_camera_instance(0)->set_near_plane(1);
 			cameraNode = app_scene->get_camera_instance(0)->get_node();
-			
-			//mouseBall.init(this, cameraToWorld.w().length(), 360.0f); 
+			cameraNode->translate(vec3(0, 5, 0));
 
 			mat4t modelToWorld;
 			material *floor_mat = new material(vec4(1, 2, 1, 3));
 
+			
+
 			// add the ground (as a static object)
 			add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
+			
+
+			//add our car, currently a box 
+			material *carMat = new material(vec4(1, 2, 3, 4));
+			add_box(modelToWorld, vec3(2.0f, 0.5f, 3.0f), carMat, true);
+			
 
 			// add the boxes (as dynamic objects)
 			modelToWorld.translate(-4.5f, 10.0f, 0);
@@ -104,20 +111,15 @@ namespace octet {
 
 		/// this is called to draw the world
 		void draw_world(int x, int y, int w, int h) {
-     
-      
+
+			
+			simulate();
+
 			int vx = 0, vy = 0;
 			get_viewport_size(vx, vy);
 			app_scene->begin_render(vx, vy);
-      int mx = 0, my = 0;
-      get_mouse_pos(mx,my);
-
-      mat4t &cam = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
-      cam.loadIdentity();
-      cam.rotateX(float(mx));
-      cam.rotateY(float(my));
-      simulate();
-
+			int mx = 0, my = 0;
+			get_mouse_pos(mx, my);
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
@@ -129,47 +131,49 @@ namespace octet {
 				modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);
 				nodes[i]->access_nodeToParent() = modelToWorld;
 			}
-
-      // update matrices. assume 30 fps.
-      app_scene->update(1.0f / 30);
+			vehicle->translate(vec3(1, 0, 0));
+			// update matrices. assume 30 fps.
+			app_scene->update(1.0f / 30);
 
 			// draw the scene
-      app_scene->render((float) vx / vy);
+			app_scene->render((float)vx / vy);
+
 		}
 		///
 		void simulate()
 		{
 			moveCar();
-      keyboardInputs();
+			keyboardInputs();
 		}
-
-		///
+		
 		void moveCar(){
 			//const float ship_speed = 0.05f;
 			// movement keys
+			vehicle = app_scene->get_mesh_instance(1)->get_node();
+			vehicle->loadIdentity();
 			if (is_key_down(key_a) || is_key_down(key_left)) {
-				cameraNode->translate(vec3(-1, 0, 0));
+				vehicle->translate(vec3(1, 0, 0));
 			}
 			if (is_key_down(key_d) || is_key_down(key_right)) {
-				cameraNode->translate(vec3(1, 0, 0));
+				vehicle->translate(vec3(-1, 0, 0));
 			}
 			if (is_key_down(key_w) || is_key_down(key_up))
 			{
-				cameraNode->translate(vec3(0, 0, -1));
+				vehicle->translate(vec3(0, 1, 0));
 			}
 			if (is_key_down(key_s) || is_key_down(key_down))
 			{
-				cameraNode->translate(vec3(0, 0, 1));
+				vehicle->translate(vec3(0, -1, 0));
 			}
 		}
-
-    ///any random keyboard functions such as esc to close the game
-    void keyboardInputs()
-    {
-      if (is_key_down(key_esc))
-      {
-        exit(1);
-      }
-    }
+		
+		///any random keyboard functions such as esc to close the game
+		void keyboardInputs()
+		{
+			if (is_key_down(key_esc))
+			{
+				exit(1);
+			}
+		}
 	};
 }
