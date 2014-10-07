@@ -18,6 +18,7 @@ namespace octet {
 
 		dynarray<btRigidBody*> rigid_bodies;
 		dynarray<scene_node*> nodes;
+    btRigidBody *caRB;
 		scene_node *cameraNode;
 		scene_node *vehicle;
 
@@ -49,6 +50,31 @@ namespace octet {
 			app_scene->add_child(node);
 			app_scene->add_mesh_instance(new mesh_instance(node, box, mat));
 		}
+    void add_car(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
+
+      btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
+      btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
+
+      btCollisionShape *shape = new btBoxShape(get_btVector3(size));
+
+      btTransform transform(matrix, pos);
+
+      btDefaultMotionState *motionState = new btDefaultMotionState(transform);
+      btScalar mass = is_dynamic ? 1.0f : 0.0f;
+      btVector3 inertiaTensor;
+
+      shape->calculateLocalInertia(mass, inertiaTensor);
+
+      caRB = new btRigidBody(mass, motionState, shape, inertiaTensor);
+      world->addRigidBody(caRB);
+
+      mesh_box *box = new mesh_box(size);
+      vehicle = new scene_node(modelToWorld, atom_);
+      nodes.push_back(vehicle);
+
+      app_scene->add_child(vehicle);
+      app_scene->add_mesh_instance(new mesh_instance(vehicle, box, mat));
+    }
 
 	public:
 		/// this is called when we construct the class before everything is initialised.
@@ -80,16 +106,12 @@ namespace octet {
 			mat4t modelToWorld;
 			material *floor_mat = new material(vec4(1, 2, 1, 3));
 
-			
-
 			// add the ground (as a static object)
 			add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
-			
 
 			//add our car, currently a box 
 			material *carMat = new material(vec4(1, 2, 3, 4));
-			add_box(modelToWorld, vec3(2.0f, 0.5f, 3.0f), carMat, true);
-			
+			add_car(modelToWorld, vec3(2.0f, 0.5f, 3.0f), carMat, true);
 
 			// add the boxes (as dynamic objects)
 			modelToWorld.translate(-4.5f, 10.0f, 0);
@@ -112,16 +134,23 @@ namespace octet {
 		/// this is called to draw the world
 		void draw_world(int x, int y, int w, int h) {
 
-			
-			simulate();
-
+      simulate();
 			int vx = 0, vy = 0;
 			get_viewport_size(vx, vy);
 			app_scene->begin_render(vx, vy);
 			int mx = 0, my = 0;
 			get_mouse_pos(mx, my);
 
-			world->stepSimulation(1.0f / 30);
+      mat4t &camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
+
+      camera.loadIdentity();
+      camera.translate(0, 20, 20);
+      camera.rotateY((float)mx * 0.1f + 90);
+      camera.rotateX((float)-my * 0.1f);
+      
+        
+      //vehicle->translate(vec3(0, 1,0));
+      world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
 				btRigidBody *rigid_body = rigid_bodies[i];
 				btQuaternion btq = rigid_body->getOrientation();
@@ -131,13 +160,12 @@ namespace octet {
 				modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);
 				nodes[i]->access_nodeToParent() = modelToWorld;
 			}
-			vehicle->translate(vec3(1, 0, 0));
+      
 			// update matrices. assume 30 fps.
 			app_scene->update(1.0f / 30);
 
 			// draw the scene
 			app_scene->render((float)vx / vy);
-
 		}
 		///
 		void simulate()
@@ -149,8 +177,6 @@ namespace octet {
 		void moveCar(){
 			//const float ship_speed = 0.05f;
 			// movement keys
-			vehicle = app_scene->get_mesh_instance(1)->get_node();
-			vehicle->loadIdentity();
 			if (is_key_down(key_a) || is_key_down(key_left)) {
 				vehicle->translate(vec3(1, 0, 0));
 			}
