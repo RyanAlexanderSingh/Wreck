@@ -154,7 +154,9 @@ namespace octet {
 
       gl_context = 0;
 	  DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;           // Window Extended Style
-    DWORD dwStyle = (WS_OVERLAPPED | WS_MAXIMIZE); //Window Style
+    //DWORD dwStyle = (WS_OVERLAPPED | WS_MAXIMIZE); //Window Style
+    DWORD dwStyle = (WS_OVERLAPPED); //Window Style
+
       window_handle = CreateWindowEx(dwExStyle, L"MyClass", L"Wreck", dwStyle,  CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
 		);

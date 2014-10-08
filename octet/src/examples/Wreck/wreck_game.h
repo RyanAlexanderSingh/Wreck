@@ -23,6 +23,7 @@ namespace octet {
 		scene_node *vehicle;
 
 		float sensitivity;
+    vec3 camPos;
 
 		void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
 
@@ -44,7 +45,7 @@ namespace octet {
 			rigid_bodies.push_back(rigid_body);
 
 			mesh_box *box = new mesh_box(size);
-			scene_node *node = new scene_node(modelToWorld, atom_);
+			scene_node *node = new scene_node(modelToWorld, atom_sid);
 			nodes.push_back(node);
 
 			app_scene->add_child(node);
@@ -102,9 +103,10 @@ namespace octet {
 			app_scene->get_camera_instance(0)->set_near_plane(1);
 			cameraNode = app_scene->get_camera_instance(0)->get_node();
 			cameraNode->translate(vec3(0, 5, 0));
-
+      camPos = vec3(0, 10, 10);
+    
 			mat4t modelToWorld;
-			material *floor_mat = new material(vec4(1, 2, 1, 3));
+			material *floor_mat = new material(vec4(1, 2, 1, 1));
 
 			// add the ground (as a static object)
 			add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
@@ -140,16 +142,17 @@ namespace octet {
 			app_scene->begin_render(vx, vy);
 			int mx = 0, my = 0;
 			get_mouse_pos(mx, my);
+      float angleX = (float)mx * 0.1f ;
+      float angleY = (float)-my * 0.1f;
 
       mat4t &camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
-
+      mat4t cameraRelease = camera.trace();
       camera.loadIdentity();
-      camera.translate(0, 20, 20);
-      camera.rotateY((float)mx * 0.1f + 90);
-      camera.rotateX((float)-my * 0.1f);
       
-        
-      //vehicle->translate(vec3(0, 1,0));
+      camera.translate(camPos.x(), camPos.y(), camPos.z());
+      camera.rotateY(angleX);
+      camera.rotateX(angleY);
+      
       world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
 				btRigidBody *rigid_body = rigid_bodies[i];
@@ -178,18 +181,23 @@ namespace octet {
 			//const float ship_speed = 0.05f;
 			// movement keys
 			if (is_key_down(key_a) || is_key_down(key_left)) {
-				vehicle->translate(vec3(1, 0, 0));
+				//vehicle->translate(vec3(1, 0, 0)); 
+        camPos.x() += 1.0f;
+
 			}
 			if (is_key_down(key_d) || is_key_down(key_right)) {
 				vehicle->translate(vec3(-1, 0, 0));
+        camPos.x() -= 1.0f;
 			}
 			if (is_key_down(key_w) || is_key_down(key_up))
 			{
 				vehicle->translate(vec3(0, 1, 0));
+        camPos.z() += 1.0f;
 			}
 			if (is_key_down(key_s) || is_key_down(key_down))
 			{
 				vehicle->translate(vec3(0, -1, 0));
+        camPos.z() -= 1.0f;
 			}
 		}
 		
