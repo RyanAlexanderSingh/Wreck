@@ -22,10 +22,8 @@ namespace octet {
 		scene_node *cameraNode;
 		scene_node *vehicle;
 		
-
-		float sensitivity;
 		vec3 camPos;
-		vec2 camAngle;
+		vec3 camAngle;
 
 		void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
 
@@ -81,31 +79,20 @@ namespace octet {
 
 		void move_camera(int x, int y, HWND  *w)
 		{
+			ShowCursor(false);
 			static bool wrap = false;
 
 			if (!wrap){
+
 				int vx, vy;
 				get_viewport_size(vx, vy);
-
-				int dx = x - vx / 2;
-				int dy = y - vy / 2;
-
-				const float sensitivity = -0.01f;
-
-				camAngle.x() = dx * 0.1f;
-				camAngle.y() = dy * 0.1f;
-
-				/*
-				if (camAngle.x() < -3.14)
-					camAngle.x() += 3.14 * 2;
-				else if (camAngle.x() > 3.14)
-					camAngle.x() -= 3.14 * 2;
-
-				if (camAngle.y() < -3.14 / 2)
-					camAngle.y() = -3.14 / 2;
-				else if (camAngle.y() > 3.14 / 2)
-					camAngle.y() = 3.14 / 2;
-				*/
+				int dx = x - vx * 0.5f;
+				int dy = y - vy * 0.5f;
+				
+				const float sensitivty = -0.1f;
+				camAngle.x() += dx * sensitivty;
+				camAngle.y() += dy * -0.5f;
+				
 				wrap = true;
 
 				tagPOINT p;
@@ -186,11 +173,18 @@ namespace octet {
 
 			mat4t &camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
 			mat4t cameraRelease = camera.trace();
+			
 			camera.loadIdentity();
-
 			camera.translate(camPos.x(), camPos.y(), camPos.z());
 			camera.rotateY(camAngle.x());
 			camera.rotateX(camAngle.y());
+
+			vec3 lookat;
+			lookat.x() = camAngle.x();
+			lookat.y() = camAngle.y();
+			lookat.z() = camAngle.z();
+
+			//camera.rotateXY(camPos, camPos + lookat, vec3(0, 1, 0));
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {

@@ -144,7 +144,7 @@ namespace octet {
       HINSTANCE instance = (HINSTANCE)GetModuleHandle(0);
       HBRUSH brush = (HBRUSH) GetStockObject(NULL_BRUSH);
       HICON icon = LoadIcon(0, IDI_ASTERISK);
-      HCURSOR cursor = LoadCursor(0, IDC_ARROW);
+      HCURSOR cursor = LoadCursor(0, IDC_CROSS);
 
       static WNDCLASSW wndclass = {
         CS_HREDRAW | CS_VREDRAW, DefWindowProc, 0, 0, instance,
