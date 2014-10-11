@@ -102,6 +102,7 @@ namespace octet {
 
 		virtual void draw_world(int x, int y, int w, int h) = 0;
 		virtual void app_init() = 0;
+		virtual void move_camera(int x, int y, HWND* w){};
 
 		// returns true if a key is down
 		bool is_key_down(unsigned key) {
