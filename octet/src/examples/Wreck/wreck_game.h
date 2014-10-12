@@ -97,13 +97,11 @@ namespace octet {
 
 				const float radius = 1.0f;
 
-				//xMove = radius * sinf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
-				xMove = radius * sinf(dx) * cosf(dy);
-				float yMove = radius * -sinf(dy);
-				zMove = radius * cosf(dx) * cosf(dy);
-				//zMove = radius * cosf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
-
-				//m_position.y() += yMove;
+				xMove = radius * sinf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
+				float yMove = radius * sinf(dy * (3.14159265f / 180));
+				zMove = radius * cosf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
+				printf("%f", yMove);
+				m_position.y() += yMove;
 
 				is_mouse_moving = false;
 
@@ -189,8 +187,10 @@ namespace octet {
 			camera.loadIdentity();
 
 			camera.rotateY(camAngle.x());
+			printf("%f", camAngle.y());
 			camera.rotateX(camAngle.y());
-			camera.translate(m_position.x(), m_position.y(), 0);
+			camera.translate(m_position.x(), m_position.y(), m_position.z());
+			
 
 
 			world->stepSimulation(1.0f / 30);
