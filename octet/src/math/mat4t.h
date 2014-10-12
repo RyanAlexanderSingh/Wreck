@@ -222,6 +222,7 @@ namespace octet { namespace math {
       v[b] = v[b] * cosAngle - v[a] * sinAngle;
       v[a] = t;
       return *this;
+	  printf("%s", *this);
     }
 
     /// rotate by angle in degrees about X axis

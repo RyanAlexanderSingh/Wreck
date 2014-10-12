@@ -102,13 +102,12 @@ namespace octet {
 
 		virtual void draw_world(int x, int y, int w, int h) = 0;
 		virtual void app_init() = 0;
-		virtual void move_camera(int x, int y, HWND* w){};
+		virtual void move_camera(int x, int y, HWND* w) = 0;
 
 		// returns true if a key is down
 		bool is_key_down(unsigned key) {
 			return keys[key & 0xff] == 1;
 		}
-
 
 		void get_mouse_pos(int &x, int &y) {
 			x = mouse_x;

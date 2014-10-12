@@ -18,12 +18,14 @@ namespace octet {
 
 		dynarray<btRigidBody*> rigid_bodies;
 		dynarray<scene_node*> nodes;
-		btRigidBody *caRB;
+		btRigidBody *carBody;
 		scene_node *cameraNode;
 		scene_node *vehicle;
 		
-		vec3 camPos;
+		vec3 m_position;
 		vec3 camAngle;
+		float xMove;
+		float zMove;
 
 		void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
 
@@ -66,8 +68,8 @@ namespace octet {
 
 			shape->calculateLocalInertia(mass, inertiaTensor);
 
-			caRB = new btRigidBody(mass, motionState, shape, inertiaTensor);
-			world->addRigidBody(caRB);
+			carBody = new btRigidBody(mass, motionState, shape, inertiaTensor);
+			world->addRigidBody(carBody);
 
 			mesh_box *box = new mesh_box(size);
 			vehicle = new scene_node(modelToWorld, atom_);
@@ -80,20 +82,30 @@ namespace octet {
 		void move_camera(int x, int y, HWND  *w)
 		{
 			ShowCursor(false);
-			static bool wrap = false;
+			static bool is_mouse_moving = true;
 
-			if (!wrap){
+			if (is_mouse_moving){
 
 				int vx, vy;
 				get_viewport_size(vx, vy);
 				float dx = x - vx * 0.5f;
 				float dy = y - vy * 0.5f;
-				
+
 				const float sensitivity = -0.5f;
 				camAngle.x() += dx * sensitivity;
 				camAngle.y() += dy * sensitivity;
-				
-				wrap = true;
+
+				const float radius = 1.0f;
+
+				//xMove = radius * sinf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
+				xMove = radius * sinf(dx) * cosf(dy);
+				float yMove = radius * -sinf(dy);
+				zMove = radius * cosf(dx) * cosf(dy);
+				//zMove = radius * cosf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
+
+				//m_position.y() += yMove;
+
+				is_mouse_moving = false;
 
 				tagPOINT p;
 				p.x = vx / 2;
@@ -103,7 +115,7 @@ namespace octet {
 			}
 			else
 			{
-				wrap = false;
+				is_mouse_moving = true;
 			}
 		}
 
@@ -132,11 +144,11 @@ namespace octet {
 			app_scene->get_camera_instance(0)->set_far_plane(20000);
 			app_scene->get_camera_instance(0)->set_near_plane(1);
 			cameraNode = app_scene->get_camera_instance(0)->get_node();
-			cameraNode->translate(vec3(0, 5, 0));
-			camPos = vec3(0, 10, 5);
+			cameraNode->translate(vec3(0, 20, 0));
+			m_position = vec3(10, 20, 0);
 
 			mat4t modelToWorld;
-			material *floor_mat = new material(vec4(1, 2, 1, 1));
+			material *floor_mat = new material(vec4(1, 1, 0.20f, 1));
 
 			// add the ground (as a static object)
 			add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
@@ -175,9 +187,11 @@ namespace octet {
 			mat4t cameraRelease = camera.trace();
 			
 			camera.loadIdentity();
-			camera.translate(camPos.x(), camPos.y(), camPos.z());
+
 			camera.rotateY(camAngle.x());
 			camera.rotateX(camAngle.y());
+			camera.translate(m_position.x(), m_position.y(), 0);
+
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
@@ -204,26 +218,20 @@ namespace octet {
 		}
 
 		void moveCar(){
-			//const float ship_speed = 0.05f;
 			// movement keys
 			if (is_key_down(key_a) || is_key_down(key_left)) {
-				//vehicle->translate(vec3(1, 0, 0)); 
-				camPos.x() += 1.0f;
-
+				m_position.x() += xMove;
 			}
 			if (is_key_down(key_d) || is_key_down(key_right)) {
-				vehicle->translate(vec3(-1, 0, 0));
-				camPos.x() -= 1.0f;
+				m_position.x() -= xMove;
 			}
 			if (is_key_down(key_w) || is_key_down(key_up))
 			{
-				vehicle->translate(vec3(0, 1, 0));
-				camPos.z() += 1.0f;
+				m_position.z() -= zMove;
 			}
 			if (is_key_down(key_s) || is_key_down(key_down))
 			{
-				vehicle->translate(vec3(0, -1, 0));
-				camPos.z() -= 1.0f;
+				m_position.z() += zMove;
 			}
 		}
 
