@@ -59,14 +59,14 @@ long _maxdot_large( const float *vv, const float *vec, unsigned long count, floa
     
     long maxIndex = -1L;
     
-    size_t segment = 0;
+    unsigned long segment = 0;
     float4 stack_array[ STACK_ARRAY_COUNT ];
     
 #ifdef DEBUG
     memset( stack_array, -1, STACK_ARRAY_COUNT * sizeof(stack_array[0]) );
 #endif
     
-    size_t index;
+    unsigned  index;
     float4 max;
     // Faster loop without cleanup code for full tiles
     for ( segment = 0; segment + STACK_ARRAY_COUNT*4 <= count; segment += STACK_ARRAY_COUNT*4 ) 
@@ -172,7 +172,7 @@ long _maxdot_large( const float *vv, const float *vec, unsigned long count, floa
             dotMax = max;
             
             // find first occurrence of that max  
-            size_t test;
+            long test;
             for( index = 0; 0 == (test=_mm_movemask_ps( _mm_cmpeq_ps( stack_array[index], max))); index++ )   // local_count must be a multiple of 4
             {}
             // record where it is.
@@ -444,14 +444,14 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
     
     long minIndex = -1L;
 
-    size_t segment = 0;
+    unsigned long segment = 0;
     float4 stack_array[ STACK_ARRAY_COUNT ];
     
 #ifdef DEBUG
     memset( stack_array, -1, STACK_ARRAY_COUNT * sizeof(stack_array[0]) );
 #endif
     
-    size_t index;
+    unsigned long index;
     float4 min;
     // Faster loop without cleanup code for full tiles
     for ( segment = 0; segment + STACK_ARRAY_COUNT*4 <= count; segment += STACK_ARRAY_COUNT*4 ) 
@@ -557,7 +557,7 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
             dotmin = min;
             
             // find first occurrence of that min  
-            size_t test;
+            unsigned long test;
             for( index = 0; 0 == (test=_mm_movemask_ps( _mm_cmpeq_ps( stack_array[index], min))); index++ )   // local_count must be a multiple of 4
             {}
             // record where it is.
@@ -665,7 +665,7 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
         }
     }
     
-    size_t localCount = (count & -4L) - 4*index;
+    unsigned long localCount = (count & -4L) - 4*index;
     if( localCount )
     {
         

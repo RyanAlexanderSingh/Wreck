@@ -86,12 +86,12 @@ namespace octet {
 
 				int vx, vy;
 				get_viewport_size(vx, vy);
-				int dx = x - vx * 0.5f;
-				int dy = y - vy * 0.5f;
+				float dx = x - vx * 0.5f;
+				float dy = y - vy * 0.5f;
 				
-				const float sensitivty = -0.1f;
-				camAngle.x() += dx * sensitivty;
-				camAngle.y() += dy * -0.5f;
+				const float sensitivity = -0.5f;
+				camAngle.x() += dx * sensitivity;
+				camAngle.y() += dy * sensitivity;
 				
 				wrap = true;
 
@@ -178,13 +178,6 @@ namespace octet {
 			camera.translate(camPos.x(), camPos.y(), camPos.z());
 			camera.rotateY(camAngle.x());
 			camera.rotateX(camAngle.y());
-
-			vec3 lookat;
-			lookat.x() = camAngle.x();
-			lookat.y() = camAngle.y();
-			lookat.z() = camAngle.z();
-
-			//camera.rotateXY(camPos, camPos + lookat, vec3(0, 1, 0));
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {

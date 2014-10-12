@@ -154,8 +154,7 @@ namespace octet {
 
       gl_context = 0;
 	  DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;           // Window Extended Style
-    //DWORD dwStyle = (WS_OVERLAPPED | WS_MAXIMIZE); //Window Style
-    DWORD dwStyle = (WS_OVERLAPPED); //Window Style
+	  DWORD dwStyle = (WS_POPUP); //Window Style
 
       window_handle = CreateWindowEx(dwExStyle, L"MyClass", L"Wreck", dwStyle,  CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
@@ -173,8 +172,13 @@ namespace octet {
       set_viewport_size(rect.right - rect.left, rect.bottom - rect.top);
 
       app_init();
-  
-      SetWindowLong(window_handle, GWL_STYLE, 0); // remove all window styles such as borders
+
+
+	  int xPos = (GetSystemMetrics(SM_CXSCREEN) - rect.right) / 2;
+	  int yPos = (GetSystemMetrics(SM_CYSCREEN) - rect.bottom) / 2;
+
+	  SetWindowPos(window_handle, 0, xPos, yPos, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+      //SetWindowLong(window_handle, GWL_STYLE, 0); // remove all window styles such as borders
       ShowWindow (window_handle, SW_SHOW);
       UpdateWindow (window_handle);
     }
