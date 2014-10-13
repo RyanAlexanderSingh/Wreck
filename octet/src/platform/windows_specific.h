@@ -156,7 +156,7 @@ namespace octet {
 	  DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;           // Window Extended Style
 	  DWORD dwStyle = (WS_POPUP); //Window Style
 
-      window_handle = CreateWindowEx(dwExStyle, L"MyClass", L"Wreck", dwStyle,  CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
+      window_handle = CreateWindowEx(dwExStyle, L"MyClass", L"Wreck", dwStyle,  CW_USEDEFAULT, CW_USEDEFAULT, 1000, 768,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
 		);
 

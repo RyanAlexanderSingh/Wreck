@@ -99,9 +99,9 @@ namespace octet {
 
 				xMove = radius *  cosf(camAngle.y() * (3.14159265f / 180)) * sinf(camAngle.x() * (3.14159265f / 180));
 				float yMove = radius * -sinf(dy * (3.14159265f / 180));
-				//zMove = radius * cosf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
-        zMove = radius * cosf(dx * (3.14159265f / 180));
+        zMove = radius * cosf(dx * (3.14159265f / 180)) * cosf(dy * (3.14159265f / 180));
 				printf("%f", yMove);
+        m_position.y() = yMove;
 
 				is_mouse_moving = false;
 
@@ -182,10 +182,11 @@ namespace octet {
 
 			mat4t &camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
 			
-			camera.loadIdentity();		
+			camera.loadIdentity();
+      
 			camera.rotateY(camAngle.x());
 			camera.rotateX(camAngle.y());
-      camera.translate(m_position.x(), 10, m_position.z());
+      camera.translate(m_position.x(), 0, m_position.z());
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
@@ -212,6 +213,7 @@ namespace octet {
 		}
 
 		void moveCar(){
+      printf("\n%f, %f, %f\n", m_position.x(), m_position.y(), m_position.z());
 			// movement keys
 			if (is_key_down(key_a) || is_key_down(key_left)) {
 				m_position.x() += xMove;
