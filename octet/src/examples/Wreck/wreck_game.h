@@ -101,7 +101,9 @@ namespace octet {
 				float yMove = radius * -sinf(dy * (3.14159265f / 180));
         zMove = radius * cosf(dx * (3.14159265f / 180)) * cosf(dy * (3.14159265f / 180));
 				printf("%f", yMove);
-        m_position.y() = yMove;
+        //m_position.x() = xMove;
+        m_position.y() += yMove;
+        //m_position.z() = zMove;
 
 				is_mouse_moving = false;
 
@@ -142,7 +144,7 @@ namespace octet {
 			app_scene->get_camera_instance(0)->set_far_plane(20000);
 			app_scene->get_camera_instance(0)->set_near_plane(1);
 			cameraNode = app_scene->get_camera_instance(0)->get_node();
-			cameraNode->translate(vec3(0, 0, 5));
+			//cameraNode->translate(vec3(0, 0, 5));
 
 			mat4t modelToWorld;
 			material *floor_mat = new material(vec4(1, 1, 0.20f, 1));
@@ -151,8 +153,8 @@ namespace octet {
 			add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
 			//add our car, currently a box 
-			material *carMat = new material(vec4(1, 2, 3, 4));
-			add_car(modelToWorld, vec3(2.0f, 0.5f, 3.0f), carMat, true);
+			//material *carMat = new material(vec4(1, 2, 3, 4));
+			//add_car(modelToWorld, vec3(2.0f, 0.5f, 3.0f), carMat, true);
 
 			// add the boxes (as dynamic objects)
 			modelToWorld.translate(-4.5f, 10.0f, 0);
@@ -183,10 +185,9 @@ namespace octet {
 			mat4t &camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
 			
 			camera.loadIdentity();
-      
 			camera.rotateY(camAngle.x());
-			camera.rotateX(camAngle.y());
-      camera.translate(m_position.x(), 0, m_position.z());
+      camera.translate(m_position.x(), 5, m_position.z());
+      camera.rotateX(camAngle.y());
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
@@ -205,6 +206,7 @@ namespace octet {
 			// draw the scene
 			app_scene->render((float)vx / vy);
 		}
+
 		///
 		void simulate()
 		{
