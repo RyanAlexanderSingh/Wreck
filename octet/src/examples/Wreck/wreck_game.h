@@ -95,13 +95,13 @@ namespace octet {
 				camAngle.x() += dx * sensitivity;
 				camAngle.y() += dy * sensitivity;
 
-				const float radius = 10.0f;
+				const float radius = 1.0f;
 
 				xMove = radius *  cosf(camAngle.y() * (3.14159265f / 180)) * sinf(camAngle.x() * (3.14159265f / 180));
-				float yMove = radius * sinf(dy * (3.14159265f / 180));
-				zMove = radius * cosf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
+				float yMove = radius * -sinf(dy * (3.14159265f / 180));
+				//zMove = radius * cosf(dy * (3.14159265f / 180)) * cosf(dx * (3.14159265f / 180));
+        zMove = radius * cosf(dx * (3.14159265f / 180));
 				printf("%f", yMove);
-				//m_position.y() = yMove;
 
 				is_mouse_moving = false;
 
@@ -182,11 +182,10 @@ namespace octet {
 
 			mat4t &camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
 			
-			camera.loadIdentity();
-
-			camera.translate(0, 10, 20);
+			camera.loadIdentity();		
 			camera.rotateY(camAngle.x());
 			camera.rotateX(camAngle.y());
+      camera.translate(m_position.x(), 10, m_position.z());
 
 			world->stepSimulation(1.0f / 30);
 			for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
