@@ -18,9 +18,7 @@ namespace octet {
 
     dynarray<btRigidBody*> rigid_bodies;
     dynarray<scene_node*> nodes;
-    btRigidBody *carBody;
-    scene_node *cameraNode;
-    scene_node *vehicle;
+    scene_node *carBody;
 
     vec3 m_position;
     vec3 camAngle;
@@ -53,11 +51,41 @@ namespace octet {
       app_scene->add_child(node);
       app_scene->add_mesh_instance(new mesh_instance(node, box, mat));
     }
-    void add_car(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
 
+    void add_car(mat4t_in modelToWorld, vec3_in size) {
+
+      btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
+      btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
+
+      btCollisionShape *shape = new btBoxShape(get_btVector3(size));
+
+      btTransform transform(matrix, pos);
+
+      btDefaultMotionState *motionState = new btDefaultMotionState(transform);
+      btScalar mass = 10.0f;
+      btVector3 inertiaTensor;
+
+      shape->calculateLocalInertia(mass, inertiaTensor);
+      btRigidBody *rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
+
+      rigid_body->setAngularFactor(btVector3(0, 0, 0));
+      rigid_body->setFriction(1.0f);
+      rigid_body->setUserPointer(carBody); //change this name, andy will kill you
+      rigid_body->setActivationState(DISABLE_DEACTIVATION);
+      world->addRigidBody(rigid_body);
+      rigid_bodies.push_back(rigid_body);
+
+      mesh_box *box = new mesh_box(vec3(1, 1, 3));
+      scene_node *node = new scene_node(modelToWorld, atom_);
+      nodes.push_back(node);
+
+      app_scene->add_child(node);
+      material *floor_mat = new material(vec4(0, 1, 1, 1));
+      app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
     }
 
-    void camera_to_car(int x, int y, HWND  *w)
+    ///this function is responsible for moving the camera based on mouse position
+    void move_camera(int x, int y, HWND  *w)
     {
       static bool is_mouse_moving = true;
 
@@ -68,6 +96,7 @@ namespace octet {
         float dx = x - vx * 0.5f;
         float dy = y - vy * 0.5f;
 
+        //apply the deltaX and deltaY of the mouse to the camera angles.
         const float sensitivity = -0.5f;
         camAngle.x() += dx * sensitivity;
         camAngle.y() += dy * sensitivity;
@@ -81,6 +110,7 @@ namespace octet {
 
         is_mouse_moving = false;
 
+        //set the position of the mouse to the center of the window
         tagPOINT p;
         p.x = vx * 0.5f;
         p.y = vy * 0.5f;
@@ -115,13 +145,15 @@ namespace octet {
       //hide the cursor
       ShowCursor(false);
 
+      //set gravity for the world
+      world->setGravity(btVector3(0.0f, -50.0f, 0.0f));
+
       //load the scene and camera
       app_scene = new visual_scene();
       app_scene->create_default_camera_and_lights();
-      app_scene->get_camera_instance(0)->set_far_plane(20000);
       app_scene->get_camera_instance(0)->set_near_plane(1);
-      cameraNode = app_scene->get_camera_instance(0)->get_node();
-      //cameraNode->translate(vec3(0, 0, 5));
+      app_scene->get_camera_instance(0)->set_far_plane(20000);
+      app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 10, 0));
 
       mat4t modelToWorld;
       material *floor_mat = new material(vec4(1, 1, 0.20f, 1));
@@ -129,9 +161,8 @@ namespace octet {
       // add the ground (as a static object)
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
-      //add our car, currently a box 
-      //material *carMat = new material(vec4(1, 2, 3, 4));
-      //add_car(modelToWorld, vec3(2.0f, 0.5f, 3.0f), carMat, true);
+      //add the car (a dynamic object)
+      add_car(modelToWorld, vec3(1, 1, 3));
 
       // add the boxes (as dynamic objects)
       modelToWorld.translate(-4.5f, 10.0f, 0);
@@ -159,22 +190,34 @@ namespace octet {
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
 
-      mat4t &camera = app_scene->get_camera_instance(0)->get_node()->access_nodeToParent();
-
-      camera.loadIdentity();
-      camera.rotateY(camAngle.x());
-      camera.rotateX(camAngle.y());
-      camera.translate(m_position.x(), 20, m_position.z());
-
       world->stepSimulation(1.0f / 30);
+      //need to change this
+      //for each rigid body in the world we will find the position of the cube and refresh the position of the rendered cube.
       for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
         btRigidBody *rigid_body = rigid_bodies[i];
         btQuaternion btq = rigid_body->getOrientation();
         btVector3 pos = rigid_body->getCenterOfMassPosition();
         quat q(btq[0], btq[1], btq[2], btq[3]);
-        mat4t modelToWorld = q;
-        modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);
-        nodes[i]->access_nodeToParent() = modelToWorld;
+        //forming the modelToWorld matrix
+        mat4t modelToWorld;
+        if (i != 1)
+        {
+          modelToWorld = q; 
+        }
+        else
+        {
+         
+          scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
+          nodes[i]->add_child(cameraNode);
+          mat4t &cameraMatrix = cameraNode->access_nodeToParent();
+          cameraNode->loadIdentity();
+          cameraMatrix.translate(0, 10, 20); 
+          cameraMatrix.rotateY(camAngle.x());
+          cameraMatrix.rotateX(camAngle.y()-30);
+        }
+        modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
+        nodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
+
       }
 
       // update matrices. assume 30 fps.
@@ -193,13 +236,17 @@ namespace octet {
 
     void moveCar(){
       // movement keys
-      if (is_key_down(key_a) || is_key_down(key_left)) {
+      if (is_key_down('A') || is_key_down(key_left)) {
+        rigid_bodies[1]->applyCentralImpulse(btVector3(-10, 0, 0));
       }
-      if (is_key_down(key_d) || is_key_down(key_right)) {
+      if (is_key_down('D') || is_key_down(key_right)) {
+        rigid_bodies[1]->applyCentralImpulse(btVector3(10, 0, 0));
       }
-      if (is_key_down(key_w) || is_key_down(key_up))	{
+      if (is_key_down('W') || is_key_down(key_up))	{
+        rigid_bodies[1]->applyCentralImpulse(btVector3(0, 0, 10));
       }
-      if (is_key_down(key_s) || is_key_down(key_down)){
+      if (is_key_down('S') || is_key_down(key_down)){
+        rigid_bodies[1]->applyCentralImpulse(btVector3(0, 0, -10));
       }
     }
 
