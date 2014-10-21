@@ -18,6 +18,7 @@ namespace octet {
 
     dynarray<btRigidBody*> rigid_bodies;
     dynarray<scene_node*> nodes;
+    dynarray<scene_node*> wheels;
     scene_node *carBody;
 
     vec3 m_position;
@@ -80,8 +81,40 @@ namespace octet {
       nodes.push_back(node);
 
       app_scene->add_child(node);
-      material *floor_mat = new material(new image("assets/lava.jpg"));
+      material *floor_mat = new material(vec4(0, 1, 1, 1));
       app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
+    }
+
+    void addWheels(mat4t_in modelToWorld, vec3_in size){
+
+      btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
+      btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
+
+      btCollisionShape *shape = new btBoxShape(get_btVector3(size));
+
+      btTransform transform(matrix, pos);
+
+      btDefaultMotionState *motionState = new btDefaultMotionState(transform);
+      btScalar mass = 10.0f;
+      btVector3 inertiaTensor;
+
+      shape->calculateLocalInertia(mass, inertiaTensor);
+      btRigidBody *rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
+
+      rigid_body->setAngularFactor(btVector3(0, 0, 0));
+      rigid_body->setFriction(1.0f);
+      rigid_body->setUserPointer(carBody); //change this name, andy will kill you
+      rigid_body->setActivationState(DISABLE_DEACTIVATION);
+      world->addRigidBody(rigid_body);
+      rigid_bodies.push_back(rigid_body);
+
+      mesh_sphere *wheel = new mesh_sphere(vec3(0), 0.4, 0.4);
+      scene_node *node = new scene_node(modelToWorld, atom_);
+      nodes.push_back(node);
+
+      app_scene->add_child(node);
+      material *wheel_mat = new material(vec4(0, 1, 1, 1));
+      app_scene->add_mesh_instance(new mesh_instance(node, wheel, wheel_mat));
     }
 
     ///this function is responsible for moving the camera based on mouse position
@@ -164,6 +197,8 @@ namespace octet {
       //add the car (a dynamic object)
       add_car(modelToWorld, vec3(1, 0.5, 3));
 
+      addWheels(modelToWorld, vec3(0.4, 0.4, 0.4));
+
       // add the boxes (as dynamic objects)
       modelToWorld.translate(-4.5f, 10.0f, 0);
       material *mat = new material(vec4(0, 1, 0, 1));
@@ -190,7 +225,6 @@ namespace octet {
       app_scene->begin_render(vx, vy);
 
       world->stepSimulation(1.0f / 30);
-
       //need to change this
       //for each rigid body in the world we will find the position of the cube and refresh the position of the rendered cube.
       for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
