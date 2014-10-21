@@ -75,12 +75,12 @@ namespace octet {
       world->addRigidBody(rigid_body);
       rigid_bodies.push_back(rigid_body);
 
-      mesh_box *box = new mesh_box(vec3(1, 1, 3));
+      mesh_box *box = new mesh_box(vec3(1, 0.5, 3));
       scene_node *node = new scene_node(modelToWorld, atom_);
       nodes.push_back(node);
 
       app_scene->add_child(node);
-      material *floor_mat = new material(vec4(0, 1, 1, 1));
+      material *floor_mat = new material(new image("assets/lava.jpg"));
       app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
     }
 
@@ -102,11 +102,11 @@ namespace octet {
         camAngle.y() += dy * sensitivity;
 
         const float radius = 1.0f;
+        const float radian = 3.14159265f / 180;
 
-        xMove = radius *  cosf(camAngle.y() * (3.14159265f / 180)) * sinf(camAngle.x() * (3.14159265f / 180));
-        float yMove = radius * -sinf(dy * (3.14159265f / 180));
-        zMove = radius * cosf(dx * (3.14159265f / 180)) * cosf(dy * (3.14159265f / 180));
-        printf("%f", yMove);
+        xMove = radius *  cosf(camAngle.y() * radian) * sinf(camAngle.x() * radian);
+        float yMove = radius * -sinf(dy * radian);
+        zMove = radius * cosf(dx * radian) * cosf(dy * radian);
 
         is_mouse_moving = false;
 
@@ -156,13 +156,13 @@ namespace octet {
       app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 10, 0));
 
       mat4t modelToWorld;
-      material *floor_mat = new material(vec4(1, 1, 0.20f, 1));
+      material *floor_mat = new material(new image("assets/checkerboard.jpg"));
 
       // add the ground (as a static object)
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
       //add the car (a dynamic object)
-      add_car(modelToWorld, vec3(1, 1, 3));
+      add_car(modelToWorld, vec3(1, 0.5, 3));
 
       // add the boxes (as dynamic objects)
       modelToWorld.translate(-4.5f, 10.0f, 0);
@@ -175,7 +175,6 @@ namespace octet {
         float size = rand.get(0.1f, 1.0f);
         add_box(modelToWorld, vec3(size), mat);
       }
-
       // comedy box
       modelToWorld.loadIdentity();
       modelToWorld.translate(0, 200, 0);
@@ -191,6 +190,7 @@ namespace octet {
       app_scene->begin_render(vx, vy);
 
       world->stepSimulation(1.0f / 30);
+
       //need to change this
       //for each rigid body in the world we will find the position of the cube and refresh the position of the rendered cube.
       for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
@@ -202,22 +202,20 @@ namespace octet {
         mat4t modelToWorld;
         if (i != 1)
         {
-          modelToWorld = q; 
+          modelToWorld = q;
         }
         else
         {
-         
           scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
           nodes[i]->add_child(cameraNode);
           mat4t &cameraMatrix = cameraNode->access_nodeToParent();
           cameraNode->loadIdentity();
-          cameraMatrix.translate(0, 10, 20); 
+          cameraMatrix.translate(0, 10, -20);
           cameraMatrix.rotateY(camAngle.x());
-          cameraMatrix.rotateX(camAngle.y()-30);
+          cameraMatrix.rotateX(camAngle.y() - 30);
         }
         modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
         nodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
-
       }
 
       // update matrices. assume 30 fps.
@@ -237,10 +235,10 @@ namespace octet {
     void moveCar(){
       // movement keys
       if (is_key_down('A') || is_key_down(key_left)) {
-        rigid_bodies[1]->applyCentralImpulse(btVector3(-10, 0, 0));
+        rigid_bodies[1]->applyCentralImpulse(btVector3(10, 0, 0));
       }
       if (is_key_down('D') || is_key_down(key_right)) {
-        rigid_bodies[1]->applyCentralImpulse(btVector3(10, 0, 0));
+        rigid_bodies[1]->applyCentralImpulse(btVector3(-10, 0, 0));
       }
       if (is_key_down('W') || is_key_down(key_up))	{
         rigid_bodies[1]->applyCentralImpulse(btVector3(0, 0, 10));
