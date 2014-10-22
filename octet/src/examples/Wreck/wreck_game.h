@@ -18,8 +18,8 @@ namespace octet {
 
     dynarray<btRigidBody*> rigid_bodies;
     dynarray<scene_node*> nodes;
-    dynarray<scene_node*> wheels;
-    scene_node *carBody;
+    dynarray<btRigidBody*> wheels;
+    dynarray<scene_node*> wheelnodes;
 
     vec3 m_position;
     vec3 camAngle;
@@ -71,7 +71,6 @@ namespace octet {
 
       rigid_body->setAngularFactor(btVector3(0, 0, 0));
       rigid_body->setFriction(1.0f);
-      rigid_body->setUserPointer(carBody); //change this name, andy will kill you
       rigid_body->setActivationState(DISABLE_DEACTIVATION);
       world->addRigidBody(rigid_body);
       rigid_bodies.push_back(rigid_body);
@@ -79,14 +78,14 @@ namespace octet {
       mesh_box *box = new mesh_box(vec3(1, 0.5, 3));
       scene_node *node = new scene_node(modelToWorld, atom_);
       nodes.push_back(node);
-
+      
       app_scene->add_child(node);
       material *floor_mat = new material(vec4(0, 1, 1, 1));
       app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
     }
 
     void addWheels(mat4t_in modelToWorld, vec3_in size){
-
+      //for (int i = 0; i != 4; ++i){
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
 
@@ -99,22 +98,53 @@ namespace octet {
       btVector3 inertiaTensor;
 
       shape->calculateLocalInertia(mass, inertiaTensor);
-      btRigidBody *rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
+      btRigidBody *wheel = new btRigidBody(mass, motionState, shape, inertiaTensor);
 
-      rigid_body->setAngularFactor(btVector3(0, 0, 0));
-      rigid_body->setFriction(1.0f);
-      rigid_body->setUserPointer(carBody); //change this name, andy will kill you
-      rigid_body->setActivationState(DISABLE_DEACTIVATION);
-      world->addRigidBody(rigid_body);
-      rigid_bodies.push_back(rigid_body);
+      wheel->setActivationState(DISABLE_DEACTIVATION);
+      world->addRigidBody(wheel);
+      wheels.push_back(wheel);
 
-      mesh_sphere *wheel = new mesh_sphere(vec3(0), 0.4, 0.4);
-      scene_node *node = new scene_node(modelToWorld, atom_);
-      nodes.push_back(node);
+      mesh_sphere *sphere = new mesh_sphere(vec3(0), 0.4, 0.4);
+      scene_node *wheelnode = new scene_node(modelToWorld, atom_);
+      wheelnodes.push_back(wheelnode);
 
-      app_scene->add_child(node);
+      app_scene->add_child(wheelnode);
       material *wheel_mat = new material(vec4(0, 1, 1, 1));
-      app_scene->add_mesh_instance(new mesh_instance(node, wheel, wheel_mat));
+      app_scene->add_mesh_instance(new mesh_instance(wheelnode, sphere, wheel_mat));
+      btVector3 carHinge(2.5, -1, 2.7);
+
+      /*if (i = 0)
+      {
+        carHinge = new btVector3(3.5, -1, 8.5);
+      }
+      if (i = 1)
+      {
+        carHinge = new btVector3(-3.5, -1, 8.5);
+      }
+      if (i = 2)
+      {
+        carHinge = new btVector3(3.5, -1, 0.5);
+      }
+      if (i = 3)
+      {
+        carHinge = new btVector3(-3.5, -1, 0.5);
+      }*/
+
+      btTransform frameInA, frameInB;
+      frameInA = btTransform::getIdentity();
+      frameInB = btTransform::getIdentity();
+
+      btSliderConstraint *hinge = new btSliderConstraint((*rigid_bodies[1]), (*wheels[0]), frameInA, frameInB, true);
+
+      //btHingeConstraint *hinge = new btHingeConstraint((*rigid_bodies[1]), (*wheels[0]), carHinge, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
+      hinge->setLowerLinLimit(-15.0F);
+      hinge->setUpperLinLimit(-5.0F);
+
+
+      hinge->setLowerAngLimit(-SIMD_PI / 3.0F);
+      //hinge->setUpperAngLimit(SIMD_PI / 3.0F);
+      world->addConstraint(hinge, true);
+      //}
     }
 
     ///this function is responsible for moving the camera based on mouse position
@@ -195,7 +225,7 @@ namespace octet {
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
       //add the car (a dynamic object)
-      add_car(modelToWorld, vec3(1, 0.5, 3));
+      add_car(modelToWorld, vec3(1, 0.5, 9));
 
       addWheels(modelToWorld, vec3(0.4, 0.4, 0.4));
 
@@ -211,9 +241,9 @@ namespace octet {
         add_box(modelToWorld, vec3(size), mat);
       }
       // comedy box
-      modelToWorld.loadIdentity();
+      /*modelToWorld.loadIdentity();
       modelToWorld.translate(0, 200, 0);
-      add_box(modelToWorld, vec3(5.0f), floor_mat);
+      add_box(modelToWorld, vec3(5.0f), floor_mat);*/
     }
 
     /// this is called to draw the world
@@ -252,12 +282,23 @@ namespace octet {
         nodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
       }
 
+      for (unsigned i = 0; i != wheels.size(); ++i){
+        btRigidBody *wheel = wheels[i];
+        btQuaternion btq = wheel->getOrientation();
+        btVector3 pos = wheel->getCenterOfMassPosition();
+        quat q(btq[0], btq[1], btq[2], btq[3]);
+        //forming the modelToWorld matrix
+        mat4t modelToWorld;
+        modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
+       wheelnodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
+      }
+
       // update matrices. assume 30 fps.
       app_scene->update(1.0f / 30);
 
       // draw the scene
       app_scene->render((float)vx / vy);
-    }
+  }
 
     ///
     void simulate()
