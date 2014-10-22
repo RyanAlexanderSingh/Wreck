@@ -75,11 +75,7 @@ namespace octet {
       world->addRigidBody(rigid_body);
       rigid_bodies.push_back(rigid_body);
 
-<<<<<<< HEAD
-      mesh_box *box = new mesh_box(vec3(1, 1, 3));
-=======
       mesh_box *box = new mesh_box(vec3(1, 0.5, 3));
->>>>>>> 8e5152208cf0a93edb77c1d2c5da8d6aad83fa14
       scene_node *node = new scene_node(modelToWorld, atom_);
       nodes.push_back(node);
       
@@ -89,11 +85,11 @@ namespace octet {
     }
 
     void addWheels(mat4t_in modelToWorld, vec3_in size){
-      //for (int i = 0; i != 4; ++i){
+
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
 
-      btCollisionShape *shape = new btBoxShape(get_btVector3(size));
+	  btCollisionShape *shape = new btCylinderShape(get_btVector3(size));
 
       btTransform transform(matrix, pos);
 
@@ -108,47 +104,25 @@ namespace octet {
       world->addRigidBody(wheel);
       wheels.push_back(wheel);
 
-      mesh_sphere *sphere = new mesh_sphere(vec3(0), 0.4, 0.4);
-      scene_node *wheelnode = new scene_node(modelToWorld, atom_);
+	  mat4t wheelsize;
+	  wheelsize.scale(-0.5, 1, 1);
+	  wheelsize.rotate(90, 0, 1, 0);
+	  wheelsize.translate(0, 0.4, 0);
+	  mesh_cylinder *m_cylinder = new mesh_cylinder(zcylinder(), wheelsize, 16);
+      scene_node *wheelnode = new scene_node(wheelsize, atom_);
       wheelnodes.push_back(wheelnode);
 
       app_scene->add_child(wheelnode);
-      material *wheel_mat = new material(vec4(0, 1, 1, 1));
-      app_scene->add_mesh_instance(new mesh_instance(wheelnode, sphere, wheel_mat));
+      material *wheel_mat = new material(vec4(0, 1, 0, 1));
+      app_scene->add_mesh_instance(new mesh_instance(wheelnode, m_cylinder, wheel_mat));
       btVector3 carHinge(2.5, -1, 2.7);
-
-      /*if (i = 0)
-      {
-        carHinge = new btVector3(3.5, -1, 8.5);
-      }
-      if (i = 1)
-      {
-        carHinge = new btVector3(-3.5, -1, 8.5);
-      }
-      if (i = 2)
-      {
-        carHinge = new btVector3(3.5, -1, 0.5);
-      }
-      if (i = 3)
-      {
-        carHinge = new btVector3(-3.5, -1, 0.5);
-      }*/
 
       btTransform frameInA, frameInB;
       frameInA = btTransform::getIdentity();
       frameInB = btTransform::getIdentity();
 
-      btSliderConstraint *hinge = new btSliderConstraint((*rigid_bodies[1]), (*wheels[0]), frameInA, frameInB, true);
-
-      //btHingeConstraint *hinge = new btHingeConstraint((*rigid_bodies[1]), (*wheels[0]), carHinge, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
-      hinge->setLowerLinLimit(-15.0F);
-      hinge->setUpperLinLimit(-5.0F);
-
-
-      hinge->setLowerAngLimit(-SIMD_PI / 3.0F);
-      //hinge->setUpperAngLimit(SIMD_PI / 3.0F);
+      btHingeConstraint *hinge = new btHingeConstraint((*rigid_bodies[1]), (*wheels[0]), carHinge, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
       world->addConstraint(hinge, true);
-      //}
     }
 
     ///this function is responsible for moving the camera based on mouse position
@@ -229,9 +203,9 @@ namespace octet {
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
       //add the car (a dynamic object)
-      add_car(modelToWorld, vec3(1, 0.5, 9));
+      add_car(modelToWorld, vec3(1, 0.5, 3));
 
-      addWheels(modelToWorld, vec3(0.4, 0.4, 0.4));
+      addWheels(modelToWorld, vec3(0.5, 1, 1));
 
       // add the boxes (as dynamic objects)
       modelToWorld.translate(-4.5f, 10.0f, 0);
@@ -259,36 +233,8 @@ namespace octet {
       app_scene->begin_render(vx, vy);
 
       world->stepSimulation(1.0f / 30);
-      //need to change this
-<<<<<<< HEAD
-      //for each rigid body in the world we will find the position of the cube and refresh the position of the rendered cube.
-      for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
-        btRigidBody *rigid_body = rigid_bodies[i];
-        btQuaternion btq = rigid_body->getOrientation();
-        btVector3 pos = rigid_body->getCenterOfMassPosition();
-        quat q(btq[0], btq[1], btq[2], btq[3]);
-        //forming the modelToWorld matrix
-        mat4t modelToWorld;
-        if (i != 1)
-        {
-          modelToWorld = q; 
-        }
-        else
-        {
-         
-          scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
-          nodes[i]->add_child(cameraNode);
-          mat4t &cameraMatrix = cameraNode->access_nodeToParent();
-          cameraNode->loadIdentity();
-          cameraMatrix.translate(0, 10, 20); 
-          cameraMatrix.rotateY(camAngle.x());
-          cameraMatrix.rotateX(camAngle.y()-30);
-        }
-        modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
-        nodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
 
-=======
-      //for each rigid body in the world we will find the position of the cube and refresh the position of the rendered cube.
+      //update the rigid bodies
       for (unsigned i = 0; i != rigid_bodies.size(); ++i) {
         btRigidBody *rigid_body = rigid_bodies[i];
         btQuaternion btq = rigid_body->getOrientation();
@@ -300,7 +246,7 @@ namespace octet {
         {
           modelToWorld = q;
         }
-        else
+        else //camera is on rigidbody one - could change this
         {
           scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
           nodes[i]->add_child(cameraNode);
@@ -314,6 +260,7 @@ namespace octet {
         nodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
       }
 
+	  //update the wheels
       for (unsigned i = 0; i != wheels.size(); ++i){
         btRigidBody *wheel = wheels[i];
         btQuaternion btq = wheel->getOrientation();
@@ -323,7 +270,6 @@ namespace octet {
         mat4t modelToWorld;
         modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
        wheelnodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
->>>>>>> 8e5152208cf0a93edb77c1d2c5da8d6aad83fa14
       }
 
       // update matrices. assume 30 fps.
@@ -343,17 +289,20 @@ namespace octet {
     void moveCar(){
       // movement keys
       if (is_key_down('A') || is_key_down(key_left)) {
-        rigid_bodies[1]->applyCentralImpulse(btVector3(10, 0, 0));
+        wheels[0]->applyCentralImpulse(btVector3(10, 0, 0));
       }
       if (is_key_down('D') || is_key_down(key_right)) {
-        rigid_bodies[1]->applyCentralImpulse(btVector3(-10, 0, 0));
+		  wheels[0]->applyCentralImpulse(btVector3(-10, 0, 0));
       }
       if (is_key_down('W') || is_key_down(key_up))	{
-        rigid_bodies[1]->applyCentralImpulse(btVector3(0, 0, 10));
+		  wheels[0]->applyCentralImpulse(btVector3(0, 0, 10));
       }
       if (is_key_down('S') || is_key_down(key_down)){
-        rigid_bodies[1]->applyCentralImpulse(btVector3(0, 0, -10));
+		  wheels[0]->applyCentralImpulse(btVector3(0, 0, -10));
       }
+	  if (is_key_down(key_space)){
+		  wheels[0]->setFriction(10);
+	  }
     }
 
     ///any random keyboard functions such as esc to close the game
