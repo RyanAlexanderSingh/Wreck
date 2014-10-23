@@ -21,9 +21,6 @@ namespace octet {
     dynarray<btRigidBody*> wheels;
     dynarray<scene_node*> wheelnodes;
 
-    dynarray<btRigidBody*> axils;
-    dynarray<scene_node*> axilnodes;
-
     vec3 m_position;
     vec3 camAngle;
     float xMove;
@@ -87,13 +84,12 @@ namespace octet {
       app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
     }
 
-    void add_wheels_and_axils(mat4t_in modelToWorld, vec3_in wheel_size, vec3_in axil_size){
+    void addWheels(mat4t_in modelToWorld, vec3_in size){
 
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
 
-      btCollisionShape *wheel_shape = new btCylinderShape(get_btVector3(wheel_size));
-      btCollisionShape *axil_shape = new btBoxShape(get_btVector3(axil_size));
+      btCollisionShape *shape = new btCylinderShape(get_btVector3(size));
 
       btTransform transform(matrix, pos);
 
@@ -101,8 +97,9 @@ namespace octet {
       btScalar mass = 10.0f;
       btVector3 inertiaTensor;
 
-      wheel_shape->calculateLocalInertia(mass, inertiaTensor);
-      btRigidBody *wheel = new btRigidBody(mass, motionState, wheel_shape, inertiaTensor);
+      shape->calculateLocalInertia(mass, inertiaTensor);
+      btRigidBody *wheel = new btRigidBody(mass, motionState, shape, inertiaTensor);
+
       wheel->setActivationState(DISABLE_DEACTIVATION);
       world->addRigidBody(wheel);
       wheels.push_back(wheel);
@@ -118,92 +115,36 @@ namespace octet {
       app_scene->add_child(wheelnode);
       material *wheel_mat = new material(vec4(0, 0, 0, 1));
       app_scene->add_mesh_instance(new mesh_instance(wheelnode, m_cylinder, wheel_mat));
-
-      axil_shape->calculateLocalInertia(mass, inertiaTensor);
-      btRigidBody *axil = new btRigidBody(mass, motionState, axil_shape, inertiaTensor);
-      axil->setActivationState(DISABLE_DEACTIVATION);
-      world->addRigidBody(axil);
-      axils.push_back(axil);
-
-      mat4t axilsize;
-      axilsize.scale(1, 1, 3);
-      axilsize.rotate(90, 0, 0, 0);
-      mesh_box *axil_box = new mesh_box(axil_size);
-      scene_node *axilnode = new scene_node(axilsize, atom_);
-      axilnodes.push_back(axilnode);
-
-      app_scene->add_child(axilnode);
-      material *axil_mat = new material(vec4(1, 0, 0, 1));
-      app_scene->add_mesh_instance(new mesh_instance(axilnode, axil_box, axil_mat));
     }
 
-    void makeCar(vec3_in chassis_size, vec3_in axil_size){
+    void makeCar(){
 
       //add the distance x,y,z for the car to wheels
-      float caDist_x = (chassis_size.x() * 0.5f) - (axil_size.x() * 0.5f);
-      float caDist_y = (chassis_size.z() * 0.5f) - (1.5f  * axil_size.x());
-      float caDist_z = (chassis_size.y() + axil_size.z()) * 0.5f;
 
-      //FRONT TWO WHEELS
-      //TOP LEFT WHEEL
       //Chassis to Axil - Hinge 1
 
-      btVector3 PivotA(caDist_x, caDist_y, 0.0f);
-      btVector3 PivotB(0.0f, 0.0f, caDist_z);
-
-      btVector3 AxisA(0.0f, 0.0f, 1.0f);
-      btVector3 AxisB(0.0f, 0.0f, 1.0f);
-
-      btHingeConstraint *hingeCA_0 = new btHingeConstraint((*rigid_bodies[1]), (*axils[0]), PivotA, PivotB, AxisA, AxisB);
-      world->addConstraint(hingeCA_0, true);
-      
-      float awDist_x = (axil_size.x() * 0.5f) + 1.0f;
-
       //Axil to Wheel - Hinge 1
+      btVector3 AW_1(3, -1, 2.7);
 
-      PivotA = btVector3(awDist_x * 0.5f, 0.0f, 0.0f);
-      PivotB = btVector3(-awDist_x * 0.5f, 0.0f, 0.0f);
-      
-      AxisA = btVector3(1.0f, 0.0f, 0.0f);
-      AxisB = btVector3(1.0f, 0.0f, 0.0f);
-
-      btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), PivotA, PivotB, AxisA, AxisB);
+      btHingeConstraint *hingeAW_1 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[0]), AW_1, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
       world->addConstraint(hingeAW_1, true);
 
-      //TOP RIGHT WHEEL
-
-      //Chassis to Axil - Hinge 2
-
-      PivotA = btVector3(-awDist_x, caDist_y, 0.0f);
-      PivotB = btVector3(0.0f, 0.0f, -caDist_y);
-      AxisA = btVector3(0.0f, 0.0f, 1.0f);
-      AxisB = btVector3(0.0f, 0.0f, 1.0f);
-
-      btHingeConstraint *hingeCA_2 = new btHingeConstraint((*rigid_bodies[1]), (*axils[1]), PivotA, PivotB, AxisA, AxisB);
-      world->addConstraint(hingeCA_2, true);
-
       //Axil to Wheel - Hinge 2
+      btVector3 AW_2(-3, -1, 2.7);
 
-      PivotA = btVector3(-awDist_x * 0.5f, 0.0f, 0.0f);
-      PivotB = btVector3(awDist_x * 0.5f, 0.0f, 0.0f);
-      AxisA = btVector3(1.0f, 0.0f, 0.0f);
-      AxisB = btVector3(1.0f, 0.0f, 0.0f);
-
-      btHingeConstraint *hingeAW_2 = new btHingeConstraint((*axils[1]), (*wheels[1]), PivotA, PivotB, AxisA, AxisB);
+      btHingeConstraint *hingeAW_2 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[1]), AW_2, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
       world->addConstraint(hingeAW_2, true);
-
-      //REAR TWO WHEELS
 
       //Axil to Wheel - Hinge 3
       btVector3 AW_3(3, -1, -2.7);
 
-      btHingeConstraint *hingeAW_3 = new btHingeConstraint((*axils[2]), (*wheels[2]), AW_3, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(0, 0, 0), true);
+      btHingeConstraint *hingeAW_3 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[2]), AW_3, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
       world->addConstraint(hingeAW_3, true);
 
       //Axil to Wheel - Hinge 4
       btVector3 AW_4(-3, -1, -2.7);
 
-      btHingeConstraint *hingeAW_4 = new btHingeConstraint((*axils[3]), (*wheels[3]), AW_4, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(0, 0, 0), true);
+      btHingeConstraint *hingeAW_4 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[3]), AW_4, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
       world->addConstraint(hingeAW_4, true);
     }
 
@@ -285,15 +226,13 @@ namespace octet {
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
       //add the car (a dynamic object)
-      vec3 chassis_size = (2.0f, 0.5f, 3.0f);
-      add_car(modelToWorld, chassis_size);
+      add_car(modelToWorld, vec3(2, 0.5, 3));
 
-      vec3 axil_size = (0.25f, 0.25f, 0.25f);
       for (int i = 0; i != 4; ++i){
-        add_wheels_and_axils(modelToWorld, vec3(0.5f, 1.0f, 1.0f), axil_size);
+        addWheels(modelToWorld, vec3(0.5, 1, 1));
       }
 
-      makeCar(chassis_size, axil_size);
+      makeCar();
 
       // add the boxes (as dynamic objects)
       modelToWorld.translate(-4.5f, 10.0f, 0);
@@ -358,18 +297,6 @@ namespace octet {
         mat4t modelToWorld;
         modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
         wheelnodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
-      }
-
-      //update the axils
-      for (unsigned i = 0; i != axils.size(); ++i){
-        btRigidBody *axil = axils[i];
-        btQuaternion btq = axil->getOrientation();
-        btVector3 pos = axil->getCenterOfMassPosition();
-        quat q(btq[0], btq[1], btq[2], btq[3]);
-        //forming the modelToWorld matrix
-        mat4t modelToWorld;
-        modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
-        axilnodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
       }
 
       // update matrices. assume 30 fps.
