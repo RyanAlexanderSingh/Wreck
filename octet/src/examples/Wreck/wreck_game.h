@@ -47,43 +47,55 @@ namespace octet {
     }
 
     void add_car(mat4t_in modelToWorld, vec3_in size) {
+
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
+
       btCollisionShape *shape = new btBoxShape(get_btVector3(size));
+
       btTransform transform(matrix, pos);
+
       btDefaultMotionState *motionState = new btDefaultMotionState(transform);
+
       btScalar mass = 20.0f;
-      btVector3 inertiaTensor;
+	  btVector3 inertiaTensor;
       shape->calculateLocalInertia(mass, inertiaTensor);
+
       btRigidBody *rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
       rigid_body->setAngularFactor(btVector3(0, 0, 0));
       rigid_body->setFriction(1.0f);
       rigid_body->setActivationState(DISABLE_DEACTIVATION);
       world->addRigidBody(rigid_body);
       rigid_bodies.push_back(rigid_body);
+
       mesh_box *box = new mesh_box(vec3(2, 0.5, 3));
       scene_node *node = new scene_node(modelToWorld, atom_);
       nodes.push_back(node);
+
       app_scene->add_child(node);
       material *floor_mat = new material(vec4(0, 1, 1, 1));
       app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
     }
 
     void addWheels(mat4t_in modelToWorld, vec3_in size, material *wheel_mat){
-
-	  
+  
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
+
       btCollisionShape *shape = new btCylinderShape(get_btVector3(size));
+
       btTransform transform(matrix, pos);
+
       btDefaultMotionState *motionState = new btDefaultMotionState(transform);
       btScalar mass = 10.0f;
       btVector3 inertiaTensor;
       shape->calculateLocalInertia(mass, inertiaTensor);
+
       btRigidBody *wheel = new btRigidBody(mass, motionState, shape, inertiaTensor);
       wheel->setActivationState(DISABLE_DEACTIVATION);
       world->addRigidBody(wheel);
       wheels.push_back(wheel);
+
       mat4t wheelsize;
       wheelsize.scale(-0.5, 1, 1);
       wheelsize.rotate(90, 0, 1, 0);
@@ -91,6 +103,7 @@ namespace octet {
       mesh_cylinder *m_cylinder = new mesh_cylinder(zcylinder(), wheelsize, 16);
       scene_node *wheelnode = new scene_node(wheelsize, atom_);
       wheelnodes.push_back(wheelnode);
+
       app_scene->add_child(wheelnode);
       app_scene->add_mesh_instance(new mesh_instance(wheelnode, m_cylinder, wheel_mat));
     }
@@ -140,8 +153,8 @@ namespace octet {
 
       //Axil to Wheel - Hinge 1
      
-	  btVector3 AW_1(-0.6f, 0.0f, 0.0f);
-	  btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
+	  btVector3 AW_1(0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
       world->addConstraint(hingeAW_1, true);
 
       //Chassis to Axil - Hinge 2
@@ -155,8 +168,8 @@ namespace octet {
       world->addConstraint(hingeCA_2, true);
 
       //Axil to Wheel - Hinge 2
-	  btVector3 AW_2(0.6f, 0.0f, 0.0f);
-	  btHingeConstraint *hingeAW_2 = new btHingeConstraint((*axils[1]), (*wheels[1]), AW_2, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
+	  btVector3 AW_2(-0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_2 = new btHingeConstraint((*axils[1]), (*wheels[1]), AW_2, btVector3(0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
       world->addConstraint(hingeAW_2, true);
 
       //Chassis to Axil - Hinge 3
@@ -170,8 +183,8 @@ namespace octet {
       world->addConstraint(hingeCA_3, true);
 
       //Axil to Wheel - Hinge 3
-	  btVector3 AW_3(-0.6f, 0.0f, 0.0f);
-	  btHingeConstraint *hingeAW_3 = new btHingeConstraint((*axils[2]), (*wheels[2]), AW_3, btVector3(0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
+	  btVector3 AW_3(0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_3 = new btHingeConstraint((*axils[2]), (*wheels[2]), AW_3, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
 	  world->addConstraint(hingeAW_3, true);
 
       //Chassis to Axil - Hinge 4
@@ -185,29 +198,35 @@ namespace octet {
       world->addConstraint(hingeCA_4, true);
 
       //Axil to Wheel - Hinge 4
-	  btVector3 AW_4(0.6f, 0.0f, 0.0f);
-	  btHingeConstraint *hingeAW_4 = new btHingeConstraint((*axils[3]), (*wheels[3]), AW_4, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
+	  btVector3 AW_4(-0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_4 = new btHingeConstraint((*axils[3]), (*wheels[3]), AW_4, btVector3(0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
 	  world->addConstraint(hingeAW_4, true);
     }
     ///this function is responsible for moving the camera based on mouse position
     void move_camera(int x, int y, HWND *w)
     {
       static bool is_mouse_moving = true;
+
       if (is_mouse_moving){
+
         int vx, vy;
         get_viewport_size(vx, vy);
         float dx = x - vx * 0.5f;
         float dy = y - vy * 0.5f;
+
         //apply the deltaX and deltaY of the mouse to the camera angles.
         const float sensitivity = -0.5f;
         camAngle.x() += dx * sensitivity;
         camAngle.y() += dy * sensitivity;
+
         const float radius = 1.0f;
         const float radian = 3.14159265f / 180;
         xMove = radius * cosf(camAngle.y() * radian) * sinf(camAngle.x() * radian);
         float yMove = radius * -sinf(dy * radian);
         zMove = radius * cosf(dx * radian) * cosf(dy * radian);
+
         is_mouse_moving = false;
+
         //set the position of the mouse to the center of the window
         tagPOINT p;
         p.x = vx * 0.5f;
@@ -250,12 +269,13 @@ namespace octet {
       // add the ground (as a static object)
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
       //add the car (a dynamic object)
+	  
       add_car(modelToWorld, vec3(2, 0.5, 3));
 	  
 	  material *wheel_mat = new material(new image("assets/tire.jpg"));
 	  mat4t axilMat;
-	  axilMat.rotate(180, 0.0f, 1.0f, 0.0f);
-	  axilMat.rotate(180, 1.0f, 0.0f, 0.0f);
+	  //axilMat.rotate(180, 0.0f, 1.0f, 0.0f);
+	  //axilMat.rotate(180, 1.0f, 0.0f, 0.0f);
       for (int i = 0; i != 4; ++i){
         addWheels(modelToWorld, vec3(0.5f, 1.0f, 1.0f), wheel_mat);
         addAxils(axilMat, vec3(0.5f, 0.3f, 0.25f));
