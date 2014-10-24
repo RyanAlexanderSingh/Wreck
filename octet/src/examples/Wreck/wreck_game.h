@@ -21,6 +21,9 @@ namespace octet {
     dynarray<btRigidBody*> wheels;
     dynarray<scene_node*> wheelnodes;
 
+	dynarray<btRigidBody*> axils;
+	dynarray<scene_node*> axilnodes;
+
     vec3 m_position;
     vec3 camAngle;
     float xMove;
@@ -84,12 +87,13 @@ namespace octet {
       app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
     }
 
-    void addWheels(mat4t_in modelToWorld, vec3_in size){
+    void add_wheels_and_axils(mat4t_in modelToWorld, vec3_in wheel_size, vec3_in axil_size){
 
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
 
-      btCollisionShape *shape = new btCylinderShape(get_btVector3(size));
+      btCollisionShape *wheel_shape = new btCylinderShape(get_btVector3(wheel_size)); //collision shape for the wheel
+	  btCollisionShape *axil_shape = new btBoxShape(get_btVector3(axil_size)); //collision shape for the axil
 
       btTransform transform(matrix, pos);
 
@@ -97,9 +101,8 @@ namespace octet {
       btScalar mass = 10.0f;
       btVector3 inertiaTensor;
 
-      shape->calculateLocalInertia(mass, inertiaTensor);
-      btRigidBody *wheel = new btRigidBody(mass, motionState, shape, inertiaTensor);
-
+      wheel_shape->calculateLocalInertia(mass, inertiaTensor);
+      btRigidBody *wheel = new btRigidBody(mass, motionState, wheel_shape, inertiaTensor);
       wheel->setActivationState(DISABLE_DEACTIVATION);
       world->addRigidBody(wheel);
       wheels.push_back(wheel);
@@ -107,7 +110,7 @@ namespace octet {
       mat4t wheelsize;
       wheelsize.scale(-0.5, 1, 1);
       wheelsize.rotate(90, 0, 1, 0);
-      wheelsize.translate(0, 0.4, 0);
+      wheelsize.translate(0.0f, 0.4f, 0.0f);
       mesh_cylinder *m_cylinder = new mesh_cylinder(zcylinder(), wheelsize, 16);
       scene_node *wheelnode = new scene_node(wheelsize, atom_);
       wheelnodes.push_back(wheelnode);
@@ -124,28 +127,28 @@ namespace octet {
       //Chassis to Axil - Hinge 1
 
       //Axil to Wheel - Hinge 1
-      btVector3 AW_1(3, -1, 2.7);
+      //btVector3 AW_1(3, -1, 2.7);
 
-      btHingeConstraint *hingeAW_1 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[0]), AW_1, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
-      world->addConstraint(hingeAW_1, true);
+      //btHingeConstraint *hingeAW_1 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[0]), AW_1, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
+      //world->addConstraint(hingeAW_1, true);
 
-      //Axil to Wheel - Hinge 2
-      btVector3 AW_2(-3, -1, 2.7);
+      ////Axil to Wheel - Hinge 2
+      //btVector3 AW_2(-3, -1, 2.7);
 
-      btHingeConstraint *hingeAW_2 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[1]), AW_2, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
-      world->addConstraint(hingeAW_2, true);
+      //btHingeConstraint *hingeAW_2 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[1]), AW_2, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
+      //world->addConstraint(hingeAW_2, true);
 
-      //Axil to Wheel - Hinge 3
-      btVector3 AW_3(3, -1, -2.7);
+      ////Axil to Wheel - Hinge 3
+      //btVector3 AW_3(3, -1, -2.7);
 
-      btHingeConstraint *hingeAW_3 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[2]), AW_3, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
-      world->addConstraint(hingeAW_3, true);
+      //btHingeConstraint *hingeAW_3 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[2]), AW_3, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
+      //world->addConstraint(hingeAW_3, true);
 
-      //Axil to Wheel - Hinge 4
-      btVector3 AW_4(-3, -1, -2.7);
+      ////Axil to Wheel - Hinge 4
+      //btVector3 AW_4(-3, -1, -2.7);
 
-      btHingeConstraint *hingeAW_4 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[3]), AW_4, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
-      world->addConstraint(hingeAW_4, true);
+      //btHingeConstraint *hingeAW_4 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[3]), AW_4, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
+      //world->addConstraint(hingeAW_4, true);
     }
 
     ///this function is responsible for moving the camera based on mouse position
@@ -176,7 +179,7 @@ namespace octet {
 
         //set the position of the mouse to the center of the window
         tagPOINT p;
-        p.x = vx * 0.5f;
+		p.x = vx * 0.5f;
         p.y = vy * 0.5f;
         ClientToScreen(*w, &p);
         SetCursorPos(p.x, p.y);
@@ -217,7 +220,7 @@ namespace octet {
       app_scene->create_default_camera_and_lights();
       app_scene->get_camera_instance(0)->set_near_plane(1);
       app_scene->get_camera_instance(0)->set_far_plane(20000);
-      app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 10, 0));
+      app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 10.0f, 0.0f));
 
       mat4t modelToWorld;
       material *floor_mat = new material(new image("assets/checkerboard.jpg"));
@@ -226,29 +229,25 @@ namespace octet {
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
       //add the car (a dynamic object)
-      add_car(modelToWorld, vec3(2, 0.5, 3));
+      add_car(modelToWorld, vec3(2.0f, 0.5f, 3.0f));
 
       for (int i = 0; i != 4; ++i){
-        addWheels(modelToWorld, vec3(0.5, 1, 1));
+        add_wheels_and_axils(modelToWorld, vec3(0.5f, 1.0f, 1.0f), vec3(0.5f, 0.3f, 0.25f));
       }
 
       makeCar();
 
       // add the boxes (as dynamic objects)
-      modelToWorld.translate(-4.5f, 10.0f, 0);
+      modelToWorld.translate(-4.5f, 10.0f, 0.0f);
       material *mat = new material(vec4(0, 1, 0, 1));
       //affects performance depending on size!
       math::random rand;
       for (int i = 0; i != 20; ++i) {
-        modelToWorld.translate(3, 0, 0);
+        modelToWorld.translate(3.0f, 0.0f, 0.0f);
         modelToWorld.rotateZ(360 / 20);
         float size = rand.get(0.1f, 1.0f);
         add_box(modelToWorld, vec3(size), mat);
       }
-      // comedy box
-      /*modelToWorld.loadIdentity();
-      modelToWorld.translate(0, 200, 0);
-      add_box(modelToWorld, vec3(5.0f), floor_mat);*/
     }
 
     /// this is called to draw the world
