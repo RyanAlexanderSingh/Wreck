@@ -139,17 +139,9 @@ namespace octet {
       world->addConstraint(hingeCA_1, true);
 
       //Axil to Wheel - Hinge 1
-      
-	  float AW_x = 0.65;
-
-	  /*PivotA = btVector3(0.600f, 0.0f, 0.0f); 
-	  PivotB = btVector3(0.600f, 0.0f, 0.0f); 
-	  AxisA = btVector3(1.0f, 0.0f, 0.0f);
-	  AxisB = btVector3(1.0f, 0.0f, 0.0f);*/
-
-      //btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), PivotA, PivotB, AxisA, AxisB, true);
-	  btVector3 AW_1(0.6f, 0.0f, 0.0f);
-	  btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), true);
+     
+	  btVector3 AW_1(-0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
       world->addConstraint(hingeAW_1, true);
 
       //Chassis to Axil - Hinge 2
@@ -163,8 +155,8 @@ namespace octet {
       world->addConstraint(hingeCA_2, true);
 
       //Axil to Wheel - Hinge 2
-      btVector3 AW_2(-3, -1.2, 2.7);
-      btHingeConstraint *hingeAW_2 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[1]), AW_2, btVector3(0, 0, 0), btVector3(0, 0, 3), btVector3(1, 0, 0), true);
+	  btVector3 AW_2(0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_2 = new btHingeConstraint((*axils[1]), (*wheels[1]), AW_2, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
       world->addConstraint(hingeAW_2, true);
 
       //Chassis to Axil - Hinge 3
@@ -178,9 +170,9 @@ namespace octet {
       world->addConstraint(hingeCA_3, true);
 
       //Axil to Wheel - Hinge 3
-      btVector3 AW_3(3, -1.2, -2.7);
-      btHingeConstraint *hingeAW_3 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[2]), AW_3, btVector3(0, 0, 0), btVector3(0, 0, 3), btVector3(1, 0, 0), true);
-      world->addConstraint(hingeAW_3, true);
+	  btVector3 AW_3(-0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_3 = new btHingeConstraint((*axils[2]), (*wheels[2]), AW_3, btVector3(0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
+	  world->addConstraint(hingeAW_3, true);
 
       //Chassis to Axil - Hinge 4
       PivotA = btVector3(-dist_x, dist_y, 0.0f);
@@ -190,12 +182,12 @@ namespace octet {
       AxisB = btVector3(0.0f, 0.0f, 1.0f);
 
       btHingeConstraint *hingeCA_4 = new btHingeConstraint((*rigid_bodies[1]), (*axils[3]), PivotA, PivotB, AxisA, AxisB);
-      world->addConstraint(hingeCA_4);
+      world->addConstraint(hingeCA_4, true);
 
       //Axil to Wheel - Hinge 4
-      btVector3 AW_4(-3, -1.2, -2.7);
-      btHingeConstraint *hingeAW_4 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[3]), AW_4, btVector3(0, 0, 0), btVector3(0, 0, 3), btVector3(1, 0, 0), true);
-      world->addConstraint(hingeAW_4, true);
+	  btVector3 AW_4(0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_4 = new btHingeConstraint((*axils[3]), (*wheels[3]), AW_4, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
+	  world->addConstraint(hingeAW_4, true);
     }
     ///this function is responsible for moving the camera based on mouse position
     void move_camera(int x, int y, HWND *w)
