@@ -56,7 +56,7 @@ namespace octet {
 			app_scene->add_mesh_instance(new mesh_instance(node, box, mat));
 		}
 
-		void add_car(mat4t_in modelToWorld, vec3_in size) {
+		void add_car(mat4t_in modelToWorld, vec3_in size, material *car_mat) {
 
 			btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
 			btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
@@ -81,8 +81,7 @@ namespace octet {
 			nodes.push_back(node);
 
 			app_scene->add_child(node);
-			material *floor_mat = new material(vec4(0, 1, 1, 1));
-			app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
+			app_scene->add_mesh_instance(new mesh_instance(node, box, car_mat));
 		}
 
 		void add_wheels_and_axils(mat4t_in wheelresize, vec3_in wheel_size, mat4t_in axilresize,vec3_in axil_size){
@@ -96,7 +95,7 @@ namespace octet {
 			//btTransform wheelTransform(wheelMatrix, wheelPos);
 
 			//btDefaultMotionState *wheelMotionState = new btDefaultMotionState(wheelTransform);
-			btScalar mass = 10.0f;
+			btScalar mass = 6.0f;
 			btVector3 inertiaTensor;
 
 			//wheel_shape->calculateLocalInertia(mass, inertiaTensor);
@@ -155,15 +154,32 @@ namespace octet {
 			btVector3 AxisA(0.0f, 0.0f, 1.0f);
 			btVector3 AxisB(0.0f, 0.0f, 1.0f);
 
-			btHingeConstraint *hingeAW_1 = new btHingeConstraint((*rigid_bodies[1]), (*axils[0]), PivotA, PivotB, AxisA, AxisB);
-			world->addConstraint(hingeAW_1);
-
+			btHingeConstraint *hingeCA_1 = new btHingeConstraint((*rigid_bodies[1]), (*axils[0]), PivotA, PivotB, AxisA, AxisB);
+			world->addConstraint(hingeCA_1);
 
 			//Axil to Wheel - Hinge 1
-			//btVector3 AW_1(3, -1, 2.7);
 
-			//btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axil[0]), (*wheels[0]), AW_1, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
-			//world->addConstraint(hingeAW_1, true);
+			//float distToWheel_x = (axil.x()*0.5f) + 0.1f;
+
+			//PivotA = btVector3(1.f, 0.0f, 0.0f);
+			//PivotB = btVector3(0.1f, 0.0f, 0.0f);
+
+			//AxisA = btVector3(0.1f, 0.0f, 0.0f);
+			//AxisB = btVector3(0.1f, 0.0f, 0.0f);
+
+			//btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), PivotA, PivotB, AxisA, AxisB);
+			//world->addConstraint(hingeAW_1);
+
+			//Chassis to Axil - Hinge 2
+
+			PivotA = btVector3(-dist_x, dist_y, 0.0f);
+			PivotB = btVector3(0.0f, 0.0f, -dist_z);
+
+			AxisA = btVector3(0.0f, 0.0f, 1.0f);
+			AxisB = btVector3(0.0f, 0.0f, 1.0f);
+
+			btHingeConstraint *hingeCA_2 = new btHingeConstraint((*rigid_bodies[1]), (*axils[1]), PivotA, PivotB, AxisA, AxisB);
+			world->addConstraint(hingeCA_2);
 
 			////Axil to Wheel - Hinge 2
 			//btVector3 AW_2(-3, -1, 2.7);
@@ -171,11 +187,33 @@ namespace octet {
 			//btHingeConstraint *hingeAW_2 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[1]), AW_2, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
 			//world->addConstraint(hingeAW_2, true);
 
+			//Chassis to Axil - Hinge 3
+
+			PivotA = btVector3(dist_x, dist_y, 0.0f);
+			PivotB = btVector3(0.0f, 0.0f, dist_z);
+
+			AxisA = btVector3(0.0f, 0.0f, 1.0f);
+			AxisB = btVector3(0.0f, 0.0f, 1.0f);
+
+			btHingeConstraint *hingeCA_3 = new btHingeConstraint((*rigid_bodies[1]), (*axils[2]), PivotA, PivotB, AxisA, AxisB);
+			world->addConstraint(hingeCA_3);
+
 			////Axil to Wheel - Hinge 3
 			//btVector3 AW_3(3, -1, -2.7);
 
 			//btHingeConstraint *hingeAW_3 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[2]), AW_3, btVector3(0, 0, 0), btVector3(2, 0, 3), btVector3(1, 0, 0), true);
 			//world->addConstraint(hingeAW_3, true);
+
+			//Chassis to Axil - Hinge 3
+
+			PivotA = btVector3(-dist_x, dist_y, 0.0f);
+			PivotB = btVector3(0.0f, 0.0f, dist_z);
+
+			AxisA = btVector3(0.0f, 0.0f, 1.0f);
+			AxisB = btVector3(0.0f, 0.0f, 1.0f);
+
+			btHingeConstraint *hingeCA_4 = new btHingeConstraint((*rigid_bodies[1]), (*axils[3]), PivotA, PivotB, AxisA, AxisB);
+			world->addConstraint(hingeCA_4);
 
 			////Axil to Wheel - Hinge 4
 			//btVector3 AW_4(-3, -1, -2.7);
@@ -256,14 +294,15 @@ namespace octet {
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 10.0f, 0.0f));
 
 			mat4t modelToWorld;
-			material *floor_mat = new material(new image("assets/checkerboard.jpg"));
+			material *floor_mat = new material(new image("assets/floor.jpg"));
 
 			// add the ground (as a static object)
 			add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
 			//add the car (a dynamic object)
 			vec3 chassis(2.0f, 0.5f, 3.0f);
-			add_car(modelToWorld, chassis);
+			material *car_mat = new material(new image("assets/car.jpg"));
+			add_car(modelToWorld, chassis, car_mat);
 
 			mat4t wheelresize;
 			wheelresize.scale(-0.5, 1, 1);
@@ -317,7 +356,7 @@ namespace octet {
 					nodes[i]->add_child(cameraNode);
 					mat4t &cameraMatrix = cameraNode->access_nodeToParent();
 					cameraNode->loadIdentity();
-					cameraMatrix.translate(10, 2, 0);
+					cameraMatrix.translate(0, 10, -20);
 					cameraMatrix.rotateY(camAngle.x());
 					cameraMatrix.rotateX(camAngle.y() - 30);
 				}
@@ -338,7 +377,7 @@ namespace octet {
 			//}
 
 			//update the axils
-			for (unsigned i = 0; i != 1; ++i){
+			for (unsigned i = 0; i != axils.size(); ++i){
 				btRigidBody *axil = axils[i];
 				btQuaternion btq = axil->getOrientation();
 				btVector3 pos = axil->getCenterOfMassPosition();
@@ -366,20 +405,18 @@ namespace octet {
 		void moveCar(){
 			// movement keys
 			if (is_key_down('A') || is_key_down(key_left)) {
-				wheels[0]->applyCentralImpulse(btVector3(10, 0, 0));
-				wheels[1]->applyCentralImpulse(btVector3(10, 0, 0));
-			}
+			}	
 			if (is_key_down('D') || is_key_down(key_right)) {
 				wheels[0]->applyCentralImpulse(btVector3(-10, 0, 0));
-				wheels[1]->applyCentralImpulse(btVector3(-10, 0, 0));
+				//wheels[1]->applyCentralImpulse(btVector3(-10, 0, 0));
 			}
 			if (is_key_down('W') || is_key_down(key_up))	{
-				wheels[0]->applyCentralImpulse(btVector3(0, 0, 10));
-				wheels[1]->applyCentralImpulse(btVector3(0, 0, 10));
+				rigid_bodies[1]->applyCentralImpulse(btVector3(10, 0, 0));
 			}
+				//wheels[1]->applyCentralImpulse(btVector3(0, 0, 10));
 			if (is_key_down('S') || is_key_down(key_down)){
 				wheels[0]->applyCentralImpulse(btVector3(0, 0, -10));
-				wheels[1]->applyCentralImpulse(btVector3(0, 0, -10));
+				//wheels[1]->applyCentralImpulse(btVector3(0, 0, -10));
 			}
 			if (is_key_down(key_space)){
 				wheels[0]->setFriction(10);
