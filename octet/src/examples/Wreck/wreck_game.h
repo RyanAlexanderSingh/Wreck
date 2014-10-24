@@ -69,7 +69,9 @@ namespace octet {
       app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
     }
 
-    void addWheels(mat4t_in modelToWorld, vec3_in size){
+    void addWheels(mat4t_in modelToWorld, vec3_in size, material *wheel_mat){
+
+	  
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
       btCollisionShape *shape = new btCylinderShape(get_btVector3(size));
@@ -90,7 +92,6 @@ namespace octet {
       scene_node *wheelnode = new scene_node(wheelsize, atom_);
       wheelnodes.push_back(wheelnode);
       app_scene->add_child(wheelnode);
-      material *wheel_mat = new material(vec4(0, 0, 0, 1));
       app_scene->add_mesh_instance(new mesh_instance(wheelnode, m_cylinder, wheel_mat));
     }
 
@@ -138,8 +139,17 @@ namespace octet {
       world->addConstraint(hingeCA_1, true);
 
       //Axil to Wheel - Hinge 1
-      btVector3 AW_1(3, -1.2, 2.7);
-      btHingeConstraint *hingeAW_1 = new btHingeConstraint((*rigid_bodies[1]), (*wheels[0]), AW_1, btVector3(0, 0, 0), btVector3(0, 0, 3), btVector3(1, 0, 0), true);
+      
+	  float AW_x = 0.65;
+
+	  /*PivotA = btVector3(0.600f, 0.0f, 0.0f); 
+	  PivotB = btVector3(0.600f, 0.0f, 0.0f); 
+	  AxisA = btVector3(1.0f, 0.0f, 0.0f);
+	  AxisB = btVector3(1.0f, 0.0f, 0.0f);*/
+
+      //btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), PivotA, PivotB, AxisA, AxisB, true);
+	  btVector3 AW_1(0.6f, 0.0f, 0.0f);
+	  btHingeConstraint *hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), true);
       world->addConstraint(hingeAW_1, true);
 
       //Chassis to Axil - Hinge 2
@@ -243,16 +253,20 @@ namespace octet {
       app_scene->create_default_camera_and_lights();
       app_scene->get_camera_instance(0)->set_near_plane(1);
       app_scene->get_camera_instance(0)->set_far_plane(20000);
-      app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 10, 0));
       mat4t modelToWorld;
-      material *floor_mat = new material(new image("assets/checkerboard.jpg"));
+      material *floor_mat = new material(new image("assets/floor.jpg"));
       // add the ground (as a static object)
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
       //add the car (a dynamic object)
       add_car(modelToWorld, vec3(2, 0.5, 3));
+	  
+	  material *wheel_mat = new material(new image("assets/tire.jpg"));
+	  mat4t axilMat;
+	  axilMat.rotate(180, 0.0f, 1.0f, 0.0f);
+	  axilMat.rotate(180, 1.0f, 0.0f, 0.0f);
       for (int i = 0; i != 4; ++i){
-        addWheels(modelToWorld, vec3(0.5f, 1.0f, 1.0f));
-        addAxils(modelToWorld, vec3(0.5f, 0.3f, 0.25f));
+        addWheels(modelToWorld, vec3(0.5f, 1.0f, 1.0f), wheel_mat);
+        addAxils(axilMat, vec3(0.5f, 0.3f, 0.25f));
       }
       makeCar();
       // add the boxes (as dynamic objects)
@@ -297,7 +311,8 @@ namespace octet {
           mat4t &cameraMatrix = cameraNode->access_nodeToParent();
           cameraNode->loadIdentity();
           cameraMatrix.translate(0, 10, -20);
-          cameraMatrix.rotateY(camAngle.x());
+          //cameraMatrix.rotateY(camAngle.x());
+		  cameraMatrix.rotate(180, 0, 1, 0);
           cameraMatrix.rotateX(camAngle.y() - 30);
         }
         modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
