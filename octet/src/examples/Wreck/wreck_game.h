@@ -43,7 +43,7 @@ namespace octet {
     float motor_target_velocity = 0.0f; 
     float max_motor_impulse = 10.0f;
 
-    const float max_angle = 10.0f;
+    const float max_angle = 20.0f;
     const float step_angle = 1.0f;
 
 
@@ -91,12 +91,11 @@ namespace octet {
 
       btRigidBody *rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
       rigid_body->setAngularFactor(btVector3(0, 0, 0));
-      rigid_body->setFriction(1.0f);
       rigid_body->setActivationState(DISABLE_DEACTIVATION);
       world->addRigidBody(rigid_body);
       rigid_bodies.push_back(rigid_body);
 
-      mesh_box *box = new mesh_box(vec3(2, 0.1, 3));
+      mesh_box *box = new mesh_box(vec3(2.0f, 0.15f, 3.0f));
       scene_node *node = new scene_node(modelToWorld, atom_);
       nodes.push_back(node);
 
@@ -164,7 +163,7 @@ namespace octet {
 
       //Chassis to Axil - Hinge 1
       float dist_x = 2.0f - 0.5f;
-      float dist_y = 0.1f + 0.3f;
+      float dist_y = 0.15f + 0.3f;
       float dist_z = 3.0f - 0.25f;
 
       btVector3 PivotA(dist_x, dist_y, 0.0f);
@@ -195,7 +194,7 @@ namespace octet {
       world->addConstraint(hingeCA_2, true);
 
       //Axil to Wheel - Hinge 2
-      btVector3 AW_2(-0.6f, 0.0f, 0.0f);
+      btVector3 AW_2(-0.6f, -0.4f, 0.0f);
       hingeAW_2 = new btHingeConstraint((*axils[1]), (*wheels[1]), AW_2, btVector3(0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
       world->addConstraint(hingeAW_2, true);
 
@@ -211,7 +210,7 @@ namespace octet {
       world->addConstraint(hingeCA_3, true);
 
       //Axil to Wheel - Hinge 3
-      btVector3 AW_3(0.6f, 0.0f, 0.0f);
+      btVector3 AW_3(0.6f, -0.4f, 0.0f);
       hingeAW_3 = new btHingeConstraint((*axils[2]), (*wheels[2]), AW_3, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
       world->addConstraint(hingeAW_3, true);
 
@@ -227,12 +226,14 @@ namespace octet {
       world->addConstraint(hingeCA_4, true);
 
       //Axil to Wheel - Hinge 4
-      btVector3 AW_4(-0.6f, 0.0f, 0.0f);
+      btVector3 AW_4(-0.6f, -0.4f, 0.0f);
       hingeAW_4 = new btHingeConstraint((*axils[3]), (*wheels[3]), AW_4, btVector3(0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
       world->addConstraint(hingeAW_4, true);
     }
 
     ///this function is responsible for moving the camera based on mouse position
+    ///the mouse x & y positions are locked to the center of the screen, to prevent it from going out of the game
+    ///because of this, the delta x and y position of the camera is applied to a Vector3 which is later used by the camera node's rotation matrix.
     void move_camera(int x, int y, HWND *w)
     {
       static bool is_mouse_moving = true;
@@ -292,7 +293,7 @@ namespace octet {
       app_scene = new visual_scene();
       app_scene->create_default_camera_and_lights();
       app_scene->get_camera_instance(0)->set_near_plane(1);
-      app_scene->get_camera_instance(0)->set_far_plane(20000);
+      app_scene->get_camera_instance(0)->set_far_plane(2000);
 
       mat4t modelToWorld;
       material *floor_mat = new material(new image("assets/floor.jpg"));
@@ -301,19 +302,24 @@ namespace octet {
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, false);
 
       //add the car (a dynamic object)
-      add_car(modelToWorld, vec3(2.0f, 0.1f, 3.0f));
+      mat4t carMatrix;
+      carMatrix.translate(0, 100, 0);
+      add_car(carMatrix, vec3(2.0f, 0.15f, 3.0f));
 
       material *wheel_mat = new material(new image("assets/tire.jpg"));
+
       mat4t wheelsize;
-      wheelsize.scale(-0.5, 1, 1);
-      wheelsize.translate(0, 0.3f, 0);
+      wheelsize.scale(0.5f, 1.0f, 0.5f);
       wheelsize.rotate(90, 0, 1, 0);
+      wheelsize.translate(0, 0.5f, 0.0f);
+
       mat4t axilMat;
       axilMat.rotate(180, 0, 1, 0);
       for (int i = 0; i != 4; ++i){
-        addWheels(wheelsize, vec3(0.5f, 1.0f, 1.0f), wheel_mat);
+        addWheels(wheelsize, vec3(0.5f, 1.0f, 0.5f), wheel_mat);
         addAxils(axilMat, vec3(0.5f, 0.3f, 0.25f));
       }
+
       makeCar();
       // add the boxes (as dynamic objects)
       modelToWorld.translate(-4.5f, 10.0f, 0);
@@ -333,6 +339,7 @@ namespace octet {
     }
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
+
       simulate();
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
@@ -356,14 +363,14 @@ namespace octet {
           nodes[i]->add_child(cameraNode);
           mat4t &cameraMatrix = cameraNode->access_nodeToParent();
           cameraNode->loadIdentity();
-          cameraMatrix.translate(0, 3, 20);
+          cameraMatrix.translate(0, 4, 20);
           //cameraMatrix.rotateY(camAngle.x());
-          //cameraMatrix.rotate(180, 0, 1, 0);
           cameraMatrix.rotateX(camAngle.y() - 30);
         }
         modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
         nodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
       }
+
       //update the wheels
       for (unsigned i = 0; i != wheels.size(); ++i){
         btRigidBody *wheel = wheels[i];
@@ -374,6 +381,10 @@ namespace octet {
         mat4t modelToWorld;
         modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
         wheelnodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
+      }
+
+      for (int i = 0; i != 4; ++i){
+        wheels[i]->applyTorque(btVector3(0, 0, 20));
       }
 
       //update the axils
@@ -408,9 +419,8 @@ namespace octet {
         {
           hinge_bottom_limit -= step_angle * 3.14159265f / 180.0f;
           hinge_upper_limit -= step_angle * 3.14159265f / 180.0f;
-          hinge_bottom_limit++;
-          hingeCA_1->setLimit(hinge_bottom_limit, 1);
-          hingeCA_2->setLimit(hinge_bottom_limit, 1);
+          hingeCA_1->setLimit(hinge_bottom_limit, hinge_upper_limit);
+          hingeCA_2->setLimit(hinge_bottom_limit, hinge_upper_limit);
           printf("%f \n", hinge_bottom_limit);
        }
       }
@@ -419,6 +429,7 @@ namespace octet {
      if (is_key_down('W') || is_key_down(key_up))	{
       const float step_velocity = 0.2f;
       const float max_velocity = 40.0f;
+
       if (motor_target_velocity < max_velocity){
 
         motor_target_velocity += step_velocity;
@@ -429,6 +440,19 @@ namespace octet {
         hingeAW_4->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
         }
       }
+     else{
+       if (motor_target_velocity > 0.0f){
+        const float step_velocity = 0.2f;
+        motor_target_velocity -= step_velocity;
+
+         hingeAW_1->enableAngularMotor(false, motor_target_velocity, 0);
+         hingeAW_2->enableAngularMotor(false, motor_target_velocity, 0);
+         hingeAW_3->enableAngularMotor(false, motor_target_velocity, 0);
+         hingeAW_4->enableAngularMotor(false, motor_target_velocity, 0);
+
+         //motor_target_velocity = 0.0f;
+       }
+     }
       if (is_key_down('S') || is_key_down(key_down)){
       }
       if (is_key_down(key_space)){
