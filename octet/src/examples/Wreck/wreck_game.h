@@ -40,7 +40,7 @@ namespace octet {
     float hinge_bottom_limit = 0.0f;
     float hinge_upper_limit = 0.0f;
     float target_angular_velocity = 0.0f;
-    float motor_target_velocity = 0.0f; 
+    float motor_target_velocity = 0.0f;
     float max_motor_impulse = 10.0f;
 
     const float max_angle = 10.0f;
@@ -172,7 +172,6 @@ namespace octet {
 
       btVector3 AxisA(0.0f, 0.0f, 1.0f);
       btVector3 AxisB(0.0f, 0.0f, 1.0f);
-
       hingeCA_1 = new btHingeConstraint((*rigid_bodies[1]), (*axils[0]), PivotA, PivotB, AxisA, AxisB);
       hingeCA_1->setLimit(hinge_bottom_limit, hinge_upper_limit);
       world->addConstraint(hingeCA_1, true);
@@ -180,7 +179,7 @@ namespace octet {
       //Axil to Wheel - Hinge 1
 
       btVector3 AW_1(0.6f, 0.0f, 0.0f);
-      hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(-0.6f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
+      hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(-0.6f, 0.1f, 0.0f), btVector3(1.0f, 0.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f));
       world->addConstraint(hingeAW_1, true);
 
       //Chassis to Axil - Hinge 2
@@ -321,11 +320,11 @@ namespace octet {
       //affects performance depending on size!
       math::random rand;
       /*for (int i = 0; i != 20; ++i) {
-        modelToWorld.translate(3, 0, 0);
-        modelToWorld.rotateZ(360 / 20);
-        float size = rand.get(0.1f, 1.0f);
-        add_box(modelToWorld, vec3(size), mat);
-        }*/
+      modelToWorld.translate(3, 0, 0);
+      modelToWorld.rotateZ(360 / 20);
+      float size = rand.get(0.1f, 1.0f);
+      add_box(modelToWorld, vec3(size), mat);
+      }*/
       // comedy box
       /*modelToWorld.loadIdentity();
       modelToWorld.translate(0, 200, 0);
@@ -404,7 +403,7 @@ namespace octet {
       // movement keys
       if (is_key_down('A') || is_key_down(key_left)) {
 
-       if (hinge_bottom_limit > -(max_angle * 3.14159265f / 180.0f))
+        if (hinge_bottom_limit > -(max_angle * 3.14159265f / 180.0f))
         {
           hinge_bottom_limit -= step_angle * 3.14159265f / 180.0f;
           hinge_upper_limit -= step_angle * 3.14159265f / 180.0f;
@@ -412,21 +411,21 @@ namespace octet {
           hingeCA_1->setLimit(hinge_bottom_limit, 1);
           hingeCA_2->setLimit(hinge_bottom_limit, 1);
           printf("%f \n", hinge_bottom_limit);
-       }
+        }
       }
       if (is_key_down('D') || is_key_down(key_right)) {
       }
-     if (is_key_down('W') || is_key_down(key_up))	{
-      const float step_velocity = 0.2f;
-      const float max_velocity = 40.0f;
-      if (motor_target_velocity < max_velocity){
+      if (is_key_down('W') || is_key_down(key_up))	{
+        const float step_velocity = 0.2f;
+        const float max_velocity = 40.0f;
+        if (motor_target_velocity < max_velocity){
 
-        motor_target_velocity += step_velocity;
+          motor_target_velocity += step_velocity;
 
-        hingeAW_1->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
-        hingeAW_2->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
-        hingeAW_3->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
-        hingeAW_4->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+          hingeAW_1->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+          hingeAW_2->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+          hingeAW_3->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+          hingeAW_4->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
         }
       }
       if (is_key_down('S') || is_key_down(key_down)){
