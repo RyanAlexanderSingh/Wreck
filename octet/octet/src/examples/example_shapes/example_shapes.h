@@ -60,6 +60,10 @@ namespace octet {
     }
 
     void move_camera(int x, int y, HWND *w){}
+    
+    void createHinge(){
+
+    }
 
     /// this is called once OpenGL is initialized
     void app_init() {
@@ -70,14 +74,14 @@ namespace octet {
       material *red = new material(vec4(1, 0, 0, 1));
       material *green = new material(vec4(0, 1, 0, 1));
       material *blue = new material(vec4(0, 0, 1, 1));
-
+      
       mat4t mat;
       mat.translate(-3, 6, 0);
       add_shape(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, true);
 
       //mat.loadIdentity();
       //mat.translate(0, 3, 0);
-      //add_shape(mat, new mesh_box(vec3(2, 2, 2)), red, true);
+      //add_shape(mat, new mesh_box(vec3(0.5f, 0.3f, 0.25f)), red, true);
 
       mat.loadIdentity();
       mat.rotate(90, 0, 1, 0);
@@ -88,6 +92,8 @@ namespace octet {
       mat.loadIdentity();
       mat.translate(0, -1, 0);
       add_shape(mat, new mesh_box(vec3(200, 1, 200)), green, false);
+
+      createHinge();
     }
 
     /// this is called to draw the world
