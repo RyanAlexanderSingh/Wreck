@@ -85,7 +85,7 @@ namespace octet {
 
       btDefaultMotionState *motionState = new btDefaultMotionState(transform);
 
-      btScalar mass = 10.0f;
+      btScalar mass = 5.0f;
       btVector3 inertiaTensor;
       shape->calculateLocalInertia(mass, inertiaTensor);
 
@@ -120,7 +120,7 @@ namespace octet {
         btTransform transform(matrix, pos);
 
         btDefaultMotionState *motionState = new btDefaultMotionState(transform);
-        btScalar mass = 5.0f;
+        btScalar mass = 10.0f;
         btVector3 inertiaTensor;
 
         shape->calculateLocalInertia(mass, inertiaTensor);
@@ -165,22 +165,22 @@ namespace octet {
 
       //Chassis to Axil - Hinge 1
       float dist_x = 3.0f - 0.25f;
-      float dist_y = 0.1f + 0.3f;
+      float dist_y = -0.2f;
       float dist_z = 2.0f - 0.5f;
 
       btVector3 PivotA(dist_x, dist_y, 0.0f);
       btVector3 PivotB(0.0f, 0.0f, -dist_z);
 
-      btVector3 AxisA(1.0f, 0.0f, 0.0f);
-      btVector3 AxisB(1.0f, 0.0f, 0.0f);
+      btVector3 AxisA(0.0f, 1.0f, 0.0f);
+      btVector3 AxisB(0.0f, 1.0f, 0.0f);
       hingeCA_1 = new btHingeConstraint((*rigid_bodies[1]), (*axils[0]), PivotA, PivotB, AxisA, AxisB);
       hingeCA_1->setLimit(hinge_bottom_limit, hinge_upper_limit);
       world->addConstraint(hingeCA_1, true);
 
       
       //Axil to Wheel - Hinge 1
-      btVector3 AW_1(0.0, 0, 0.6);
-      hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(0, 0, -0.6f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
+      btVector3 AW_1(0.0, 0, 0.575);
+      hingeAW_1 = new btHingeConstraint((*axils[0]), (*wheels[0]), AW_1, btVector3(0, 0, -0.575f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
       world->addConstraint(hingeAW_1, true);
       
       //Chassis to Axil - Hinge 2
@@ -193,8 +193,8 @@ namespace octet {
 
       
       //Axil to Wheel - Hinge 2
-      btVector3 AW_2(0, 0, 0.6);
-      hingeAW_2 = new btHingeConstraint((*axils[1]), (*wheels[1]), AW_2, btVector3(0.0f, 0.0f, -0.6f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
+      btVector3 AW_2(0, 0, 0.575);
+      hingeAW_2 = new btHingeConstraint((*axils[1]), (*wheels[1]), AW_2, btVector3(0.0f, 0.0f, -0.575f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
       world->addConstraint(hingeAW_2, true);
       
 
@@ -208,8 +208,8 @@ namespace octet {
 
       
       //Axil to Wheel - Hinge 3
-      btVector3 AW_3(0, 0, -0.6);
-      hingeAW_3 = new btHingeConstraint((*axils[2]), (*wheels[2]), AW_3, btVector3(0.0f, 0.0f, 0.6f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
+      btVector3 AW_3(0, 0, -0.575);
+      hingeAW_3 = new btHingeConstraint((*axils[2]), (*wheels[2]), AW_3, btVector3(0.0f, 0.0f, 0.575f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
       world->addConstraint(hingeAW_3, true);
       
 
@@ -223,8 +223,8 @@ namespace octet {
 
       
       //Axil to Wheel - Hinge 4
-      btVector3 AW_4(0, 0, -0.6);
-      hingeAW_4 = new btHingeConstraint((*axils[3]), (*wheels[3]), AW_4, btVector3(0.0f, 0.0f, 0.6f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
+      btVector3 AW_4(0, 0, -0.575);
+      hingeAW_4 = new btHingeConstraint((*axils[3]), (*wheels[3]), AW_4, btVector3(0.0f, 0.0f, 0.575f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
       world->addConstraint(hingeAW_4, true);
       
     }
@@ -300,7 +300,7 @@ namespace octet {
 
       //add the car (a dynamic object)
       modelToWorld.loadIdentity();
-      modelToWorld.translate(0, 30, 0);
+      modelToWorld.translate(0, 10, 0);
       modelToWorld.rotate(90, 0, 1, 0);
       add_car(modelToWorld, vec3(2.0f, 0.1f, 3.0f));
 
@@ -311,7 +311,7 @@ namespace octet {
       wheelsize.translate(3, 2, 0);
     
       mat4t axilMat;
-      axilMat.translate(20, 10, 0);
+      //axilMat.translate(20, 10, 0);
 
 
       for (int i = 0; i != 4; ++i){
@@ -413,29 +413,46 @@ namespace octet {
     void moveCar(){
       // movement keys
       if (is_key_down('A') || is_key_down(key_left)) {
-
         if (hinge_bottom_limit > -(max_angle * 3.14159265f / 180.0f))
         {
           hinge_bottom_limit -= step_angle * 3.14159265f / 180.0f;
           hinge_upper_limit -= step_angle * 3.14159265f / 180.0f;
-          hinge_bottom_limit++;
-          hingeCA_1->setLimit(hinge_bottom_limit, 1);
-          hingeCA_2->setLimit(hinge_bottom_limit, 1);
+          hingeCA_1->setLimit(hinge_bottom_limit, hinge_upper_limit);
+          hingeCA_3->setLimit(hinge_bottom_limit, hinge_upper_limit);
           printf("%f \n", hinge_bottom_limit);
         }
       }
+
       if (is_key_down('D') || is_key_down(key_right)) {
       }
+
       if (is_key_down('W') || is_key_down(key_up))	{
-          for (int i = 0; i != 4; ++i){
+          /*for (int i = 0; i != 4; ++i){
           wheels[i]->applyCentralImpulse(btVector3(0, 0, 2));
-        }
+        }*/
+        const float step_velocity = 0.2f;
+        const float max_velocity = 40.0f;
+          if (motor_target_velocity < max_velocity)
+          {
+            motor_target_velocity += step_velocity;
+
+            hingeAW_1->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+            hingeAW_2->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+            hingeAW_3->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+            hingeAW_4->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+          }
       }
 
-      if (is_key_down('S') || is_key_down(key_down)){
-      }
-      if (is_key_down(key_space)){
-        wheels[0]->setFriction(10);
+      else{
+        if (motor_target_velocity > 0){
+          const float damping = 0.4f;
+          motor_target_velocity -= damping;
+
+          hingeAW_1->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+          hingeAW_2->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+          hingeAW_3->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+          hingeAW_4->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
+        }
       }
     }
     ///any random keyboard functions such as esc to close the game
