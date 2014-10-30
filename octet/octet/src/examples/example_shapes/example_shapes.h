@@ -28,6 +28,7 @@ namespace octet {
       btVector3 pos(get_btVector3(mat[3].xyz()));
 
       btCollisionShape *shape = is_dynamic ? msh->get_bullet_shape() : msh->get_static_bullet_shape();
+
       if (shape) {
         btTransform transform(matrix, pos);
 
@@ -60,10 +61,7 @@ namespace octet {
     }
 
     void move_camera(int x, int y, HWND *w){}
-    
-    void createHinge(){
 
-    }
 
     /// this is called once OpenGL is initialized
     void app_init() {
@@ -92,8 +90,6 @@ namespace octet {
       mat.loadIdentity();
       mat.translate(0, -1, 0);
       add_shape(mat, new mesh_box(vec3(200, 1, 200)), green, false);
-
-      createHinge();
     }
 
     /// this is called to draw the world
@@ -103,6 +99,7 @@ namespace octet {
       app_scene->begin_render(vx, vy);
 
       world->stepSimulation(1.0f/30, 1, 1.0f/30);
+
       btCollisionObjectArray &array = world->getCollisionObjectArray();
       for (int i = 0; i != array.size(); ++i) {
         btCollisionObject *co = array[i];
