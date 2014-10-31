@@ -13,6 +13,7 @@
 #include "car.h"
 #include "wreck_game.h"
 #include "wreck.h"
+#include "X360Input.h"
 
 /// Create a box with octet
 int main(int argc, char **argv) {
