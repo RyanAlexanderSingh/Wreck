@@ -18,8 +18,10 @@ namespace octet {
 
     dynarray<btRigidBody*> rigid_bodies;
     dynarray<scene_node*> nodes;
+
     dynarray<btRigidBody*> wheels;
     dynarray<scene_node*> wheelnodes;
+
     dynarray<btRigidBody*> axils;
     dynarray<scene_node*> axilnodes;
 
@@ -34,6 +36,9 @@ namespace octet {
     btHingeConstraint *hingeAW_2;
     btHingeConstraint *hingeAW_3;
     btHingeConstraint *hingeAW_4;
+
+    dynarray <btHingeConstraint*> hingesCA;
+    dynarray <btHingeConstraint*> hingesAW;
 
     vec3 camAngle;
 
@@ -159,7 +164,7 @@ namespace octet {
       material *axil_mat = new material(vec4(1, 0, 0, 1));
       app_scene->add_mesh_instance(new mesh_instance(axilnode, axilbox, axil_mat));
     }
-
+    
     void makeCar(){
       //add the distance x,y,z for the car to wheels
 
@@ -226,8 +231,19 @@ namespace octet {
       btVector3 AW_4(0, 0, -0.575);
       hingeAW_4 = new btHingeConstraint((*axils[3]), (*wheels[3]), AW_4, btVector3(0.0f, 0.0f, 0.575f), btVector3(0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 1.0f));
       world->addConstraint(hingeAW_4, true);
-      
     }
+
+    
+    //create the hinges for the chassis and the axil
+    void create_hinges(vec3_in chassis, vec3_in axil, vec3_in, btRigidBody rbA, btRigidBody rbB, dynarray <btRigidBody*> hinge_array){
+      float dist_x = chassis.z() - axil.z();
+      float dist_y = -axil.y();
+      float dist_z = chassis.x() - axil.x();
+
+      btVector3 leftofCar = btVector3(-dist_x, dist_y, 0.0f);
+      btVector3 rightofCar = btVector3(dist_x, dist_y, 0.0f);
+    }
+
 
     ///this function is responsible for moving the camera based on mouse position
     void move_camera(int x, int y, HWND *w)
@@ -302,21 +318,26 @@ namespace octet {
       modelToWorld.loadIdentity();
       modelToWorld.translate(0, 10, 0);
       modelToWorld.rotate(90, 0, 1, 0);
-      add_car(modelToWorld, vec3(2.0f, 0.1f, 3.0f));
+
+      //changed car y from 0.1f to 0.2f
+      vec3 chassis(2.0f, 0.2f, 3.0f);
+      add_car(modelToWorld, chassis);
 
       material *wheel_mat = new material(new image("assets/tire.jpg"));
-
       mat4t wheelsize;
-      //wheelsize.rotate(90, 0, 1, 0);
       wheelsize.translate(3, 2, 0);
     
-      mat4t axilMat;
-      //axilMat.translate(20, 10, 0);
-
-
+      modelToWorld.loadIdentity();
+      vec3 axil(0.5f, 0.3f, 0.25f);
       for (int i = 0; i != 4; ++i){
+      //create the meshes and rigid_bodies of the car components
         addWheels(wheelsize, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, true);
-        addAxils(axilMat, vec3(0.5f, 0.3f, 0.25f));
+        addAxils(modelToWorld, axil);
+
+        //create the hinges for the front of the car
+        //create_hinges(chassis, axil, vec3(0.0f, 1.0f, 0.0f), rigid_bodies[1], axils[i], hingesCA);
+        
+        //create the hinges for the rear of the car
       }
 
       makeCar();
@@ -367,8 +388,8 @@ namespace octet {
           nodes[i]->add_child(cameraNode);
           mat4t &cameraMatrix = cameraNode->access_nodeToParent();
           cameraNode->loadIdentity();
-          cameraMatrix.translate(0, 3, -20);
-          //cameraMatrix.rotateY(camAngle.x());
+          cameraMatrix.translate(0, 10, -20);
+          cameraMatrix.rotateY(camAngle.x());
           cameraMatrix.rotate(180, 0, 1, 0);
           cameraMatrix.rotateX(camAngle.y() - 30);
         }
@@ -442,9 +463,8 @@ namespace octet {
             hingeAW_4->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
           }
       }
-
       else{
-        if (motor_target_velocity > 0){
+        /*if (motor_target_velocity > 0){
           const float damping = 0.4f;
           motor_target_velocity -= damping;
 
@@ -452,7 +472,7 @@ namespace octet {
           hingeAW_2->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
           hingeAW_3->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
           hingeAW_4->enableAngularMotor(true, motor_target_velocity, max_motor_impulse);
-        }
+        }*/
       }
     }
     ///any random keyboard functions such as esc to close the game
