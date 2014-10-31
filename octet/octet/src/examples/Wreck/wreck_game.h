@@ -41,6 +41,7 @@ namespace octet {
     const float step_angle = 1.0f;
 
     void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
+
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
       btCollisionShape *shape = new btBoxShape(get_btVector3(size));
@@ -60,6 +61,7 @@ namespace octet {
       nodes.push_back(node);
       app_scene->add_child(node);
       app_scene->add_mesh_instance(new mesh_instance(node, box, mat));
+
     }
 
     void add_car(mat4t_in modelToWorld, vec3_in size) {
@@ -91,7 +93,8 @@ namespace octet {
       app_scene->add_mesh_instance(new mesh_instance(node, box, floor_mat));
 
     }
-    void addWheels(mat4t_in wheelsize, mesh *msh, material *mtl, bool is_dynamic){
+
+    /*void addWheels(mat4t_in wheelsize, mesh *msh, material *mtl, bool is_dynamic){
       scene_node *node = new scene_node();
       node->access_nodeToParent() = wheelsize;
       app_scene->add_child(node);
@@ -113,8 +116,10 @@ namespace octet {
         wheel->setUserPointer(node);
         wheels.push_back(wheel);
       }
-    }
-    void addAxils(mat4t_in axilsize, mesh *msh, material *mtl, bool is_dynamic){
+    }*/
+
+    void add_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, bool is_dynamic, btScalar mass){
+
       scene_node *node = new scene_node();
       node->access_nodeToParent() = axilsize;
       app_scene->add_child(node);
@@ -123,16 +128,17 @@ namespace octet {
       btMatrix3x3 matrix(get_btMatrix3x3(axilsize));
       btVector3 pos(get_btVector3(axilsize[3].xyz()));
       btCollisionShape *shape = msh->get_bullet_shape();
+
       if (shape){
         btTransform transform(matrix, pos);
         btDefaultMotionState *motionState = new btDefaultMotionState(transform);
-        btScalar mass = 5.0f;
         btVector3 inertiaTensor;
         shape->calculateLocalInertia(mass, inertiaTensor);
         btRigidBody *axil = new btRigidBody(mass, motionState, shape, inertiaTensor);
         world->addRigidBody(axil);
         axil->setUserPointer(node);
-        axils.push_back(axil);
+        rbArray->push_back(axil);
+
       }
     }
 
@@ -278,9 +284,8 @@ namespace octet {
       material *red = new material(vec4(1, 0, 0, 1));
 
       for (int i = 0; i != 4; ++i){
-        addWheels(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5)), wheel_mat, true);
-        //addWheels(modelToWorld, new mesh_box(vec3(1.0f, 1.0f, 0.5f)), wheel_mat, true);
-        addAxils(modelToWorld, new mesh_box(vec3(0.25f, 0.3f, 0.5f)), red, true);
+        add_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5)), wheel_mat, &wheels, true, 10.0f);
+        add_component(modelToWorld, new mesh_box(vec3(0.25f, 0.3f, 0.5f)), red, &axils, true, 10.0f);
       }
 
       makeCar();
@@ -396,6 +401,7 @@ namespace octet {
         }
         move_direction(motor_velocity, 10);
       }
+
       //close the progam
       if (is_key_down(key_esc))
       {
@@ -410,6 +416,7 @@ namespace octet {
       }
     }
 
+    //rotate the front two axil's at an angle
     void rotate_axils(float axil_direction_limit){
       for (int i = 0; i != 2; ++i){
         hingeCA[i]->setLimit(axil_direction_limit, axil_direction_limit);
