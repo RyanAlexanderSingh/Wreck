@@ -159,28 +159,28 @@ namespace octet {
       modelToWorld.loadIdentity();
       modelToWorld.rotate(90.0f, 0.0f, 1.0f, 0.0f);
       modelToWorld.translate(0.0f, 20.0f, 0.0f);
-      vec3 chassis_size(3.0f, 0.1f, 2.0f);
-      add_box(modelToWorld, chassis_size, floor_mat, 5.0f);
+      vec3 chassis_size(3.0f, 0.125f, 2.0f);
+      add_box(modelToWorld, chassis_size, floor_mat, 20.0f);
     
-      vec3 axil_size(0.25f, 0.3f, 0.5f);
+      vec3 axil_size(0.25f, 0.25f, 0.5f);
       material *wheel_mat = new material(new image("assets/tire.jpg"));
       material *red = new material(vec4(1, 0, 0, 1));
       for (int i = 0; i != 4; ++i){
         create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, true, 10.0f);
-        create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 10.0f);
+        create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 5.0f);
       }
     
-      float dist_x = chassis_size.x() - axil_size.x();
-      float dist_y = 0.2f;
+      float dist_x = 1.2;
+      float dist_y = 0.125f;
       float dist_z = chassis_size.z() - axil_size.z();
 
       //create the hinges for the chassis - axils
       create_hinges(*&rigid_bodies[1], *&axils[0], &hingeCA, vec3(dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[0], *&wheels[0], &hingeAW, vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, 1.0f), false);
       create_hinges(*&rigid_bodies[1], *&axils[1], &hingeCA, vec3(dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
-      create_hinges(*&axils[1], *&wheels[1], &hingeAW, vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 1.0f), false);
+      create_hinges(*&axils[1], *&wheels[1], &hingeAW, vec3(0.0f, 0.0f, 0.375f), vec3(0.0f, 0.0f, -0.375f), vec3(0.0f, 0.0f, 1.0f), false);
       create_hinges(*&rigid_bodies[1], *&axils[2], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, dist_z), vec3(0.0f, 1.0f, 0.0f), true);
-      create_hinges(*&axils[2], *&wheels[2], &hingeAW, vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, 1.0f), false);
+      create_hinges(*&axils[2], *&wheels[2], &hingeAW, vec3(0.0f, 0.0f, -0.375f), vec3(0.0f, 0.0f, 0.375f), vec3(0.0f, 0.0f, 1.0f), false);
       create_hinges(*&rigid_bodies[1], *&axils[3], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[3], *&wheels[3], &hingeAW, vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 1.0f), false);
 
