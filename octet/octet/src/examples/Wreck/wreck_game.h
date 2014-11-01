@@ -8,7 +8,7 @@ namespace octet {
   /// Scene using bullet for physics effects.
   class wreck_game : public app {
 
-    enum car_direction{DIR_LEFT, DIR_RIGHT};
+    enum car_direction{ DIR_LEFT, DIR_RIGHT };
     // scene for drawing box
     ref<visual_scene> app_scene;
     btDefaultCollisionConfiguration config; /// setup for the world
@@ -31,14 +31,11 @@ namespace octet {
 
     //Chassis-Axil Hinges
     dynarray<btHingeConstraint*> hingeCA;
-    vec3 camAngle;
+    vec3 camAngle = (0.0f, 0.0f, 0.0f);
 
     float axil_direction_limit = 0.0f;
     float target_angular_velocity = 0.0f;
     float motor_velocity = 0.0f;
-
-    const float max_angle = 7.0f;
-    const float step_angle = 1.0f;
 
     void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, bool is_dynamic = true) {
 
@@ -94,29 +91,6 @@ namespace octet {
 
     }
 
-    /*void addWheels(mat4t_in wheelsize, mesh *msh, material *mtl, bool is_dynamic){
-      scene_node *node = new scene_node();
-      node->access_nodeToParent() = wheelsize;
-      app_scene->add_child(node);
-      app_scene->add_mesh_instance(new mesh_instance(node, msh, mtl));
-      wheelnodes.push_back(node);
-      btMatrix3x3 matrix(get_btMatrix3x3(wheelsize));
-      btVector3 pos(get_btVector3(wheelsize[3].xyz()));
-      btCollisionShape *shape = msh->get_bullet_shape();
-
-      if (shape){
-        btTransform transform(matrix, pos);
-        btDefaultMotionState *motionState = new btDefaultMotionState(transform);
-        btScalar mass = 5.0f;
-        btVector3 inertiaTensor;
-        shape->calculateLocalInertia(mass, inertiaTensor);
-        btRigidBody *wheel = new btRigidBody(mass, motionState, shape, inertiaTensor);
-        wheel->setFriction(0.2);
-        world->addRigidBody(wheel);
-        wheel->setUserPointer(node);
-        wheels.push_back(wheel);
-      }
-    }*/
 
     void add_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, bool is_dynamic, btScalar mass){
 
@@ -125,31 +99,29 @@ namespace octet {
       app_scene->add_child(node);
       app_scene->add_mesh_instance(new mesh_instance(node, msh, mtl));
       axilnodes.push_back(node);
+
       btMatrix3x3 matrix(get_btMatrix3x3(axilsize));
       btVector3 pos(get_btVector3(axilsize[3].xyz()));
       btCollisionShape *shape = msh->get_bullet_shape();
 
-      if (shape){
-        btTransform transform(matrix, pos);
-        btDefaultMotionState *motionState = new btDefaultMotionState(transform);
-        btVector3 inertiaTensor;
-        shape->calculateLocalInertia(mass, inertiaTensor);
-        btRigidBody *axil = new btRigidBody(mass, motionState, shape, inertiaTensor);
-        world->addRigidBody(axil);
-        axil->setUserPointer(node);
-        rbArray->push_back(axil);
+      btTransform transform(matrix, pos);
+      btDefaultMotionState *motionState = new btDefaultMotionState(transform);
+      btVector3 inertiaTensor;
+      shape->calculateLocalInertia(mass, inertiaTensor);
 
-      }
+      btRigidBody *rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
+      world->addRigidBody(rigid_body);
+      rigid_body->setUserPointer(node);
+      rbArray->push_back(rigid_body);
     }
 
-    void makeCar(){
+    void makeCar(vec3_in chassis_size, vec3_in axil_size){
 
-      //add the distance x,y,z for the car to wheels
 
       const float hinge_limit_rear = 0.0f;
-      float dist_x = 3.0f - 0.25f;
+      float dist_x = chassis_size.x() - axil_size.x();
       float dist_y = 0.2f;
-      float dist_z = 2.0f - 0.5f;
+      float dist_z = chassis_size.z() - axil_size.z();
 
       btVector3 PivotA(dist_x, dist_y, 0.0f);
       btVector3 PivotB(0.0f, 0.0f, -dist_z);
@@ -255,6 +227,7 @@ namespace octet {
       delete broadphase;
       delete dispatcher;
     }
+
     /// this is called once OpenGL is initialized
     void app_init() {
       //hide the cursor
@@ -288,32 +261,17 @@ namespace octet {
         add_component(modelToWorld, new mesh_box(vec3(0.25f, 0.3f, 0.5f)), red, &axils, true, 10.0f);
       }
 
-      makeCar();
-
-      // add the boxes (as dynamic objects)
-      modelToWorld.translate(-4.5f, 10.0f, 0);
-      material *mat = new material(vec4(0, 1, 0, 1));
-      //affects performance depending on size!
-      math::random rand;
-      /*for (int i = 0; i != 20; ++i) {
-      modelToWorld.translate(3, 0, 0);
-      modelToWorld.rotateZ(360 / 20);
-      float size = rand.get(0.1f, 1.0f);
-      add_box(modelToWorld, vec3(size), mat);
-      }*/
-      // comedy box
-      /*modelToWorld.loadIdentity();
-      modelToWorld.translate(0, 200, 0);
-      add_box(modelToWorld, vec3(5.0f), floor_mat);*/
+      makeCar(vec3(3.0f, 0.1f, 2.0f), vec3(0.25f, 0.3f, 0.5f));
     }
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
 
-
       keyboardInputs();
+
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
+
       world->stepSimulation(1.0f / 30, 1, 1.0f / 30);
 
       //update the rigid bodies
@@ -360,8 +318,11 @@ namespace octet {
     ///any random keyboard functions such as esc to close the game
     void keyboardInputs(){
 
-      const float step_velocity = 0.2f;
+      const float max_angle = 7.0f;
+      const float step_angle = 1.0f;
+
       const float max_velocity = 10.0f;
+      const float step_velocity = 0.2f;
 
       // rotation of the front two axils - turning the chassis left or right
       if (is_key_down('A') || is_key_down(key_left)) {
@@ -392,6 +353,7 @@ namespace octet {
           move_direction(motor_velocity, 10);
         }
       }
+
       else if (motor_velocity != 0){
         if (motor_velocity > 0.0f){
           motor_velocity -= step_velocity * 2;
