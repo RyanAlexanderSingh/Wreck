@@ -31,7 +31,6 @@ namespace octet {
     vec3 camAngle = (0.0f, 0.0f, 0.0f);
 
     float axil_direction_limit = 0.0f;
-    float target_angular_velocity = 0.0f;
     float motor_velocity = 0.0f;
 
     void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, btScalar rbMass) {
@@ -89,7 +88,7 @@ namespace octet {
         hingeConstraint->setLimit(0.0f, 0.0f);
       }
       hinge_array->push_back(hingeConstraint);
-      world->addConstraint(hingeConstraint, true);
+      world->addConstraint(hingeConstraint, false);
     }
 
     ///this function is responsible for moving the camera based on mouse position
@@ -148,7 +147,7 @@ namespace octet {
       app_scene->get_camera_instance(0)->set_near_plane(1);
       app_scene->get_camera_instance(0)->set_far_plane(20000);
       app_scene->get_camera_instance(0)->get_node()->access_nodeToParent().translate(0.0f, 3.0f, 20.0f);
-
+      
       mat4t modelToWorld;
       material *floor_mat = new material(new image("assets/floor.jpg"));
 
@@ -158,29 +157,30 @@ namespace octet {
       //add the car (a dynamic object)
       modelToWorld.loadIdentity();
       modelToWorld.rotate(90.0f, 0.0f, 1.0f, 0.0f);
-      modelToWorld.translate(0.0f, 20.0f, 0.0f);
+      modelToWorld.translate(0.0f, 10.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
-      add_box(modelToWorld, chassis_size, floor_mat, 20.0f);
+      add_box(modelToWorld, chassis_size, floor_mat, 5.0f);
     
       vec3 axil_size(0.25f, 0.25f, 0.5f);
       material *wheel_mat = new material(new image("assets/tire.jpg"));
       material *red = new material(vec4(1, 0, 0, 1));
       for (int i = 0; i != 4; ++i){
-        create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, true, 10.0f);
-        create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 5.0f);
+        modelToWorld.translate(i, i, i);
+        create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, true, 5.0f);
+        create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 10.0f);
       }
     
-      float dist_x = 1.2;
-      float dist_y = 0.125f;
+      float dist_x = chassis_size.x() - axil_size.x() * 2.0f;
+      float dist_y = chassis_size.y();
       float dist_z = chassis_size.z() - axil_size.z();
 
       //create the hinges for the chassis - axils
       create_hinges(*&rigid_bodies[1], *&axils[0], &hingeCA, vec3(dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[0], *&wheels[0], &hingeAW, vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, 1.0f), false);
       create_hinges(*&rigid_bodies[1], *&axils[1], &hingeCA, vec3(dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
-      create_hinges(*&axils[1], *&wheels[1], &hingeAW, vec3(0.0f, 0.0f, 0.375f), vec3(0.0f, 0.0f, -0.375f), vec3(0.0f, 0.0f, 1.0f), false);
+      create_hinges(*&axils[1], *&wheels[1], &hingeAW, vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 1.0f), false);
       create_hinges(*&rigid_bodies[1], *&axils[2], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, dist_z), vec3(0.0f, 1.0f, 0.0f), true);
-      create_hinges(*&axils[2], *&wheels[2], &hingeAW, vec3(0.0f, 0.0f, -0.375f), vec3(0.0f, 0.0f, 0.375f), vec3(0.0f, 0.0f, 1.0f), false);
+      create_hinges(*&axils[2], *&wheels[2], &hingeAW, vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, 1.0f), false);
       create_hinges(*&rigid_bodies[1], *&axils[3], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[3], *&wheels[3], &hingeAW, vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 1.0f), false);
 
