@@ -111,6 +111,8 @@ namespace octet {
       delete dispatcher;
     }
 
+    void move_camera(int x, int y, HWND *w){}
+
     /// this is called once OpenGL is initialized
     void app_init() {
       app_scene =  new visual_scene();
