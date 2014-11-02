@@ -19,6 +19,7 @@ namespace octet {
     dynarray<btRigidBody*> rigid_bodies;
     dynarray<scene_node*> nodes;
 
+    dynarray<btRigidBody*> vehicles;
     dynarray<btRigidBody*> wheels;
     dynarray<btRigidBody*> axils;
 
@@ -74,7 +75,6 @@ namespace octet {
       world->addRigidBody(axil);
       axil->setUserPointer(node);
       rbArray->push_back(axil);
-
     }
 
     void create_hinges(btRigidBody *rbA, btRigidBody *rbB, dynarray <btHingeConstraint*> *hinge_array, vec3_in PivotA, vec3_in PivotB, vec3_in Axis, bool set_hinge_limits){
@@ -156,10 +156,10 @@ namespace octet {
 
       //add the car (a dynamic object)
       modelToWorld.loadIdentity();
-      modelToWorld.rotate(90.0f, 0.0f, 1.0f, 0.0f);
       modelToWorld.translate(0.0f, 10.0f, 0.0f);
+      modelToWorld.rotate(90.0f, 0.0f, 1.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
-      add_box(modelToWorld, chassis_size, floor_mat, 5.0f);
+      create_car_component(modelToWorld, new mesh_box(chassis_size), floor_mat, &vehicles, true, 5.0f);
     
       vec3 axil_size(0.25f, 0.25f, 0.5f);
       material *wheel_mat = new material(new image("assets/tire.jpg"));
@@ -175,19 +175,16 @@ namespace octet {
       float dist_z = chassis_size.z() - axil_size.z();
 
       //create the hinges for the chassis - axils
-      create_hinges(*&rigid_bodies[1], *&axils[0], &hingeCA, vec3(dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, dist_z), vec3(0.0f, 1.0f, 0.0f), true);
+      create_hinges(*&vehicles[0], *&axils[0], &hingeCA, vec3(dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[0], *&wheels[0], &hingeAW, vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, 1.0f), false);
-      create_hinges(*&rigid_bodies[1], *&axils[1], &hingeCA, vec3(dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
+      create_hinges(*&vehicles[0], *&axils[1], &hingeCA, vec3(dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[1], *&wheels[1], &hingeAW, vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 1.0f), false);
-      create_hinges(*&rigid_bodies[1], *&axils[2], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, dist_z), vec3(0.0f, 1.0f, 0.0f), true);
+      create_hinges(*&vehicles[0], *&axils[2], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[2], *&wheels[2], &hingeAW, vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, 1.0f), false);
-      create_hinges(*&rigid_bodies[1], *&axils[3], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
+      create_hinges(*&vehicles[0], *&axils[3], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[3], *&wheels[3], &hingeAW, vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 1.0f), false);
-
-      // add the boxes (as dynamic objects)
-      modelToWorld.translate(-4.5f, 10.0f, 0.0f);
-      math::random rand;
     }
+
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
 
@@ -206,28 +203,26 @@ namespace octet {
         quat q(btq[0], btq[1], btq[2], btq[3]);
         //forming the modelToWorld matrix
         mat4t modelToWorld;
-        if (i == 1)
-        {
-          scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
-          nodes[i]->add_child(cameraNode);
-          mat4t &cameraMatrix = cameraNode->access_nodeToParent();
-          cameraNode->loadIdentity();
-          cameraMatrix.translate(-20, 10, 0);
-          //cameraMatrix.rotateY(90);
-          cameraMatrix.rotateY(camAngle.x());
-          cameraMatrix.rotateX(camAngle.y() - 30);
-        }
         modelToWorld = q;
         modelToWorld[3] = vec4(pos[0], pos[1], pos[2], 1);//position
         nodes[i]->access_nodeToParent() = modelToWorld;//apply to the node
       }
 
-      //update the wheels & axils
+      //update the car
       btCollisionObjectArray &array = world->getCollisionObjectArray();
       for (int i = 0; i != array.size(); ++i) {
         btCollisionObject *co = array[i];
         scene_node *node = (scene_node *)co->getUserPointer();
         if (node) {
+          if (i == 1){ //the chassis
+              scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
+              node->add_child(cameraNode);
+              mat4t &cameraMatrix = cameraNode->access_nodeToParent();
+              cameraNode->loadIdentity();
+              cameraMatrix.translate(-20, 10, 0);
+              cameraMatrix.rotateY(camAngle.x());
+              cameraMatrix.rotateX(camAngle.y() - 30);
+          }
           mat4t &mat = node->access_nodeToParent();
           co->getWorldTransform().getOpenGLMatrix(mat.get());
         }
@@ -242,8 +237,8 @@ namespace octet {
     ///any random keyboard functions such as esc to close the game
     void keyboardInputs(){
 
-      const float step_velocity = 0.2f;
-      const float max_velocity = 10.0f;
+      const float step_acceleration = 0.2f;
+      const float max_velocity = 20.0f;
 
       const float step_angle = 1.0f;
       const float max_angle = 7.0f;
@@ -266,27 +261,26 @@ namespace octet {
       //moving the car forwards
       if (is_key_down('W') || is_key_down(key_up)){
         if (motor_velocity < max_velocity){
-          motor_velocity += step_velocity;
+          motor_velocity += step_acceleration;
           move_direction(motor_velocity, 10);
         }
       }
       //moving the car backwards - maximum velocity is less as we're moving backwards
       else if (is_key_down('S') || is_key_down(key_down)){
         if (motor_velocity > -max_velocity){
-          motor_velocity -= step_velocity;
+          motor_velocity -= step_acceleration;
           move_direction(motor_velocity, 10);
         }
       }
       else if (motor_velocity != 0){
         if (motor_velocity > 0.0f){
-          motor_velocity -= step_velocity * 2;
+          motor_velocity -= step_acceleration / 5;
         }
         if (motor_velocity < 0.0f){
-          motor_velocity += step_velocity * 2;
+          motor_velocity += step_acceleration / 5;
         }
         move_direction(motor_velocity, 10);
       }
-
       //close the progam
       if (is_key_down(key_esc))
       {
@@ -295,10 +289,10 @@ namespace octet {
     }
 
     //used to control the car
-    void move_direction(float motor_velocity, float max_motor_impulse){
+    void move_direction(float motor_velocity, float motor_impulse_limit){
       for (int i = 0; i != 4; ++i){
         axils[i]->activate(true);
-        hingeAW[i]->enableAngularMotor(true, motor_velocity, max_motor_impulse);
+        hingeAW[i]->enableAngularMotor(true, motor_velocity, motor_impulse_limit);
       }
     }
 
