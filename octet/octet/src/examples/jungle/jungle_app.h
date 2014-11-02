@@ -1319,6 +1319,7 @@ namespace octet {
     ~jungle_app() {
     };
 
+      // Attach input handler
     void app_init() {
       _skyShader = new sky_shader();
       _skyShader->init();
@@ -1326,7 +1327,6 @@ namespace octet {
 
       _textureShader.init();
 
-      // Attach input handler
       _input.attach(this);
 
       // Attach camera input handler

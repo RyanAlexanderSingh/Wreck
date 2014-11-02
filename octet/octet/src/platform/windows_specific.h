@@ -281,7 +281,7 @@ namespace octet {
               app->set_key(app::translate((unsigned)msg.wParam), msg.message == WM_SYSKEYDOWN);
             } else if (msg.message == WM_MOUSEMOVE) {
               app->set_mouse_pos((unsigned)msg.lParam & 0xffff, (unsigned)msg.lParam >> 16);
-              app->move_camera((unsigned)msg.lParam & 0xffff, (unsigned)msg.lParam >> 16, &app->window_handle);
+              app->set_window_handle(app->window_handle);
             }
             else if (msg.message == WM_MOUSEWHEEL) {
             } else if (msg.message == WM_MOUSEWHEEL) {

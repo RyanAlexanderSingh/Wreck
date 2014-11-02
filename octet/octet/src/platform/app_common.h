@@ -77,6 +77,7 @@ namespace octet {
     int frame_number;
     bool is_gles3;
     video_capture video_capture_;
+    HWND window_handle;
 
     // queue of files to load
     dynarray<string> load_queue;
@@ -95,8 +96,8 @@ namespace octet {
 
     virtual void draw_world(int x, int y, int w, int h) = 0;
     virtual void app_init() = 0;
-    virtual void move_camera(int x, int y, HWND* w) = 0;
 
+    
     // returns true if a key is down
     bool is_key_down(unsigned key) {
       return keys[key & 0xff] == 1;
@@ -107,6 +108,7 @@ namespace octet {
       y = mouse_y;
     }
 
+   
     int get_mouse_wheel() {
       return mouse_wheel;
     }
@@ -132,6 +134,14 @@ namespace octet {
       return &video_capture_;
     }
 
+    void get_window_handle(HWND &w){
+      w = window_handle;
+    }
+
+    void set_window_handle(HWND w){
+      window_handle = w;
+    }
+
     // used by the platform to set a key
     void set_key(unsigned key, bool is_down) {
       keys[key & 0xff] = is_down ? 1 : 0;
@@ -142,6 +152,7 @@ namespace octet {
       mouse_x = x;
       mouse_y = y;
     }
+
 
     // used by the platform to set mouse wheel clicks
     void set_mouse_wheel(int z) {
