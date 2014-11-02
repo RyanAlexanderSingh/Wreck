@@ -9,7 +9,6 @@ namespace octet {
   class wreck_game : public app {
 
     vehicle vehicle_instance;
-    camera camera_instance;
 
     // scene for drawing box
     ref<visual_scene> app_scene;
@@ -22,9 +21,7 @@ namespace octet {
     dynarray<btRigidBody*> rigid_bodies;
     dynarray<scene_node*> nodes;
 
-    
-    float axil_direction_limit = 0.0f;
-    float motor_velocity = 0.0f;
+    vec3 camAngle = (0.0f, 0.0f, 0.0f);
 
     void add_box(mat4t_in modelToWorld, vec3_in size, material *mat, btScalar rbMass) {
 
@@ -49,6 +46,36 @@ namespace octet {
       app_scene->add_mesh_instance(new mesh_instance(node, box, mat));
     }
 
+    ///this function is responsible for moving the camera based on mouse position
+    void move_camera(int x, int y, HWND *w)
+    {
+      static bool is_mouse_moving = true;
+
+      if (is_mouse_moving){
+
+        int vx, vy;
+        get_viewport_size(vx, vy);
+        float dx = x - vx * 0.5f;
+        float dy = y - vy * 0.5f;
+
+        //apply the deltaX and deltaY of the mouse to the camera angles.
+        const float sensitivity = -0.5f;
+        camAngle.x() += dx * sensitivity;
+        camAngle.y() += dy * sensitivity;
+        is_mouse_moving = false;
+
+        //set the position of the mouse to the center of the window
+        tagPOINT p;
+        p.x = vx * 0.5f;
+        p.y = vy * 0.5f;
+        ClientToScreen(*w, &p);
+        SetCursorPos(p.x, p.y);
+      }
+      else
+      {
+        is_mouse_moving = true;
+      }
+    }
 
 
   public:
@@ -81,10 +108,9 @@ namespace octet {
       app_scene->get_camera_instance(0)->set_far_plane(20000);
       app_scene->get_camera_instance(0)->get_node()->access_nodeToParent().translate(0.0f, 3.0f, 20.0f);
 
-      camera_instance.init(this);
       vehicle_instance.init(this, *&app_scene, *&world);
-      
-      
+
+
       mat4t modelToWorld;
       material *floor_mat = new material(new image("assets/floor.jpg"));
 
@@ -96,8 +122,7 @@ namespace octet {
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
 
-      //camera_instance.update();
-      vehicle_instance.update();
+      vehicle_instance.update(camAngle);
 
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);

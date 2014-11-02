@@ -96,6 +96,7 @@ namespace octet {
 
     virtual void draw_world(int x, int y, int w, int h) = 0;
     virtual void app_init() = 0;
+    virtual void move_camera(int x, int y, HWND *w) = 0;
 
     
     // returns true if a key is down
@@ -132,14 +133,6 @@ namespace octet {
 
     video_capture *get_video_capture() {
       return &video_capture_;
-    }
-
-    void get_window_handle(HWND &w){
-      w = window_handle;
-    }
-
-    void set_window_handle(HWND w){
-      window_handle = w;
     }
 
     // used by the platform to set a key
