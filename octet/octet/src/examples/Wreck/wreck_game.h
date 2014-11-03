@@ -11,6 +11,8 @@ namespace octet {
     vehicle vehicle_instance;
     xbox_controller xbox_controller;
 
+    collada_builder loader;
+
     // scene for drawing box
     ref<visual_scene> app_scene;
     btDefaultCollisionConfiguration config; /// setup for the world
@@ -108,11 +110,30 @@ namespace octet {
       app_scene->get_camera_instance(0)->set_near_plane(1);
       app_scene->get_camera_instance(0)->set_far_plane(20000);
       app_scene->get_camera_instance(0)->get_node()->access_nodeToParent().translate(0.0f, 3.0f, 20.0f);
-
+      
       vehicle_instance.init(this, *&app_scene, *&world);
 
       mat4t modelToWorld;
       material *floor_mat = new material(new image("assets/floor.jpg"));
+
+      resource_dict dict;
+      if (!loader.load_xml("assets/test_track.dae")) {
+        // failed to load file
+        return;
+      }
+      loader.get_resources(dict);
+
+      dynarray<resource*> meshes;
+      dict.find_all(meshes, atom_mesh);
+
+      material *mat = new material((new image("assets/test_track/Stone_Vein_Gray.jpg")));
+      mesh *race_track = meshes[0]->get_mesh();
+      scene_node *node = new scene_node();
+      node->scale(vec3(0.3, 0.3, 0.3));
+      node->rotate(90, vec3(0, 0, 1));
+      node->translate(vec3(0, 20, 0));
+      app_scene->add_child(node);
+      app_scene->add_mesh_instance(new mesh_instance(node, race_track, mat));
 
       // add the ground (as a static object)
       add_box(modelToWorld, vec3(200.0f, 0.5f, 200.0f), floor_mat, 0.0f);
