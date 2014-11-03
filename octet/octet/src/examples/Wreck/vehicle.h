@@ -8,7 +8,9 @@ namespace octet {
 
   ///Class to create a vehicle using hinges
   class vehicle : public resource {
-    app *the_app; 
+
+    xbox_controller xbox_controller;
+    app *the_app;
     visual_scene *app_scene;
     btDiscreteDynamicsWorld *the_world;
 
@@ -72,7 +74,7 @@ namespace octet {
 
       mat4t modelToWorld;
       modelToWorld.loadIdentity();
-      modelToWorld.translate(0.0f, 10.0f, 0.0f);
+      modelToWorld.translate(0.0f, 5.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
       create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, true, 5.0f);
 
@@ -81,9 +83,9 @@ namespace octet {
       material *red = new material(vec4(1, 0, 0, 1));
 
       for (int i = 0; i != 4; ++i){
-        modelToWorld.translate(i, 0, i);
+        modelToWorld.translate(i, 0, 0);
         create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, true, 5.0f);
-        create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 10.0f);
+        create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 20.0f);
       }
 
       float dist_x = chassis_size.x() - axil_size.x() * 2.0f;
@@ -117,8 +119,13 @@ namespace octet {
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
             cameraNode->loadIdentity();
             cameraMatrix.translate(-20, 10, 0);
-            cameraMatrix.rotateY(camera_angles.x());
-            cameraMatrix.rotateX(camera_angles.y() - 30);
+            if (xbox_controller.refresh()){
+              //camera_angles.x() = xbox_controller.right_analog_x;
+              //camera_angles.y() = xbox_controller.right_analog_y;
+            }
+              cameraMatrix.rotateY(camera_angles.x());
+              cameraMatrix.rotateX(camera_angles.y() - 30);
+            
           }
           mat4t &mat = node->access_nodeToParent();
           co->getWorldTransform().getOpenGLMatrix(mat.get());
@@ -154,17 +161,23 @@ namespace octet {
       if (the_app->is_key_down('W') || the_app->is_key_down(key_up)){
         if (motor_velocity < max_velocity){
           motor_velocity += step_acceleration;
-          move_direction(motor_velocity, 10);
         }
       }
       //moving the car backwards - maximum velocity is less as we're moving backwards
       else if (the_app->is_key_down('S') || the_app->is_key_down(key_down)){
         if (motor_velocity > -max_velocity){
           motor_velocity -= step_acceleration;
-          move_direction(motor_velocity, 10);
         }
       }
-      else if (motor_velocity != 0){
+      //if the xbox controller has been connected
+      else if (xbox_controller.refresh()){
+        motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
+        rotate_axils(xbox_controller.left_analog_x);
+      }
+
+      move_direction(motor_velocity, 10);
+
+      if (motor_velocity != 0){
         if (motor_velocity > 0.0f){
           motor_velocity -= step_acceleration / 5;
         }
@@ -198,5 +211,5 @@ namespace octet {
 
     ~vehicle() {
     }
-   };
+  };
 }

@@ -9,6 +9,7 @@ namespace octet {
   class wreck_game : public app {
 
     vehicle vehicle_instance;
+    xbox_controller xbox_controller;
 
     // scene for drawing box
     ref<visual_scene> app_scene;
@@ -77,7 +78,6 @@ namespace octet {
       }
     }
 
-
   public:
     /// this is called when we construct the class before everything is initialised.
     wreck_game(int argc, char **argv) : app(argc, argv){
@@ -92,6 +92,7 @@ namespace octet {
       delete broadphase;
       delete dispatcher;
     }
+
     /// this is called once OpenGL is initialized
     void app_init() {
 

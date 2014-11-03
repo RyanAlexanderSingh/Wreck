@@ -10,9 +10,10 @@
 #define OCTET_BULLET 1
 
 #include "../../octet.h"
+#include "xbox_controller.h"
 #include "vehicle.h"
 #include "wreck_game.h"
-#include "X360Input.h"
+
 
 /// Create a box with octet
 int main(int argc, char **argv) {
