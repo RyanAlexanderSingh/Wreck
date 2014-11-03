@@ -110,7 +110,6 @@ namespace octet {
 
       vehicle_instance.init(this, *&app_scene, *&world);
 
-
       mat4t modelToWorld;
       material *floor_mat = new material(new image("assets/floor.jpg"));
 

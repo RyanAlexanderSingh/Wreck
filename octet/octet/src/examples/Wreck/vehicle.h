@@ -33,7 +33,6 @@ namespace octet {
     }
 
     void create_car_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, bool is_dynamic, btScalar mass){
-
       scene_node *node = new scene_node();
       node->access_nodeToParent() = axilsize;
       app_scene->add_child(node);
@@ -72,10 +71,8 @@ namespace octet {
       this->the_world = world;
 
       mat4t modelToWorld;
-      //add the car (a dynamic object)
       modelToWorld.loadIdentity();
       modelToWorld.translate(0.0f, 10.0f, 0.0f);
-      modelToWorld.rotate(90.0f, 0.0f, 1.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
       create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, true, 5.0f);
 
@@ -84,7 +81,7 @@ namespace octet {
       material *red = new material(vec4(1, 0, 0, 1));
 
       for (int i = 0; i != 4; ++i){
-        modelToWorld.translate(i, i, i);
+        modelToWorld.translate(i, 0, i);
         create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, true, 5.0f);
         create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 10.0f);
       }
@@ -129,7 +126,7 @@ namespace octet {
       }
     }
 
-    ///any random keyboard functions such as esc to close the game
+    ///any 
     void keyboard_inputs(){
 
       const float step_acceleration = 0.2f;

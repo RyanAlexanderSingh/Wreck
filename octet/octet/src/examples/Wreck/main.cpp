@@ -10,7 +10,6 @@
 #define OCTET_BULLET 1
 
 #include "../../octet.h"
-#include "camera.h"
 #include "vehicle.h"
 #include "wreck_game.h"
 #include "X360Input.h"
