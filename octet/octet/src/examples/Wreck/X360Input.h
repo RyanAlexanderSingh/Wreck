@@ -5,7 +5,7 @@ private:
   //index of the gamepad
   int c_gamepadIndex;
   //current controller state
-  XINPUT_STATE c_State;
+  XINPUT_STATE controller_state;
 public:
 
   //get the state of the controller
@@ -27,9 +27,9 @@ public:
 
   bool is_connected(){
     //Zero memory
-    ZeroMemory(&c_State, sizeof(XINPUT_STATE));
+    ZeroMemory(&controller_state, sizeof(XINPUT_STATE));
 
-    DWORD result = XInputGetState(c_gamepadIndex, &c_State);
+    DWORD result = XInputGetState(c_gamepadIndex, &controller_state);
     if (result == ERROR_SUCCESS)
       return true;
     else
@@ -38,21 +38,27 @@ public:
 
   //return value of the left trigger for the controller
   float left_trigger(){
-      BYTE trigger = c_State.Gamepad.bLeftTrigger;
-      if (trigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD){
+      BYTE trigger = controller_state.Gamepad.bLeftTrigger;
+      if (trigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD){ //above threshold - therefore it counts as an action
         return trigger / 255.0f;
       }
-
+      return 0.0f; //the trigger was not pressed
   }
 
   //return the value of the right trigger for the controller
-  float right_trigger(){}
+  float right_trigger(){
+    BYTE trigger = controller_state.Gamepad.bRightTrigger;
+    if (trigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD){ //above threshold - therefore it counts as an action
+      return trigger / 255.0f;
+    }
+    return 0.0f; //the trigger was not pressed
+  }
 
   void init(int controllerIndex){
     c_gamepadIndex = controllerIndex - 1;
   }
 
   void update(){
-    c_State = get_state(); //get the current gamepad state 
+    controller_state = get_state(); //get the current gamepad state 
   }
 };
