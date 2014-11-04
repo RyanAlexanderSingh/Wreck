@@ -9,7 +9,7 @@ namespace octet {
   ///Class to create a vehicle using hinges
   class vehicle : public resource {
 
-    xbox_controller xbox_controller;
+    //xbox_controller xbox_controller;
     app *the_app;
     visual_scene *app_scene;
     btDiscreteDynamicsWorld *the_world;
@@ -36,10 +36,10 @@ namespace octet {
     }
 
     void create_car_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, bool is_dynamic, btScalar mass){
-      scene_node *node = new scene_node();
-      node->access_nodeToParent() = axilsize;
-      app_scene->add_child(node);
-      app_scene->add_mesh_instance(new mesh_instance(node, msh, mtl));
+      scene_node *vehicle_nodes = new scene_node();
+      vehicle_nodes->access_nodeToParent() = axilsize;
+      app_scene->add_child(vehicle_nodes);
+      app_scene->add_mesh_instance(new mesh_instance(vehicle_nodes, msh, mtl));
       btMatrix3x3 matrix(get_btMatrix3x3(axilsize));
       btVector3 pos(get_btVector3(axilsize[3].xyz()));
       btCollisionShape *shape = msh->get_bullet_shape();
@@ -48,10 +48,10 @@ namespace octet {
       btDefaultMotionState *motionState = new btDefaultMotionState(transform);
       btVector3 inertiaTensor;
       shape->calculateLocalInertia(mass, inertiaTensor);
-      btRigidBody *axil = new btRigidBody(mass, motionState, shape, inertiaTensor);
-      the_world->addRigidBody(axil);
-      axil->setUserPointer(node);
-      rbArray->push_back(axil);
+      btRigidBody *component = new btRigidBody(mass, motionState, shape, inertiaTensor);
+      the_world->addRigidBody(component);
+      component->setUserPointer(vehicle_nodes);
+      rbArray->push_back(component);
     }
 
     void create_hinges(btRigidBody *rbA, btRigidBody *rbB, dynarray <btHingeConstraint*> *hinge_array, vec3_in PivotA, vec3_in PivotB, vec3_in Axis, bool set_hinge_limits){
@@ -74,7 +74,6 @@ namespace octet {
       this->the_world = world;
 
       mat4t modelToWorld;
-      modelToWorld.loadIdentity();
       modelToWorld.translate(0.0f, 5.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
       create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, true, 5.0f);
@@ -112,23 +111,23 @@ namespace octet {
       btCollisionObjectArray &array = the_world->getCollisionObjectArray();
       for (int i = 0; i != array.size(); ++i) {
         btCollisionObject *co = array[i];
-        scene_node *node = (scene_node *)co->getUserPointer();
-        if (node) {
-          if (i == 0){ //the chassis
+        scene_node *vehicle_nodes = (scene_node *)co->getUserPointer();
+        if (vehicle_nodes) {
+          if (i == 1){ //the chassis
             scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
-            node->add_child(cameraNode);
+            vehicle_nodes->add_child(cameraNode);
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
             cameraNode->loadIdentity();
             cameraMatrix.translate(-20, 10, 0);
-            if (xbox_controller.refresh()){
+            //if (xbox_controller.refresh()){
               //camera_angles.x() = xbox_controller.right_analog_x;
               //camera_angles.y() = xbox_controller.right_analog_y;
-            }
+            //}
               cameraMatrix.rotateY(camera_angles.x());
               cameraMatrix.rotateX(camera_angles.y() - 30);
             
           }
-          mat4t &mat = node->access_nodeToParent();
+          mat4t &mat = vehicle_nodes->access_nodeToParent();
           co->getWorldTransform().getOpenGLMatrix(mat.get());
         }
       }
@@ -164,20 +163,23 @@ namespace octet {
           motor_velocity += step_acceleration;
         }
       }
+
       //moving the car backwards - maximum velocity is less as we're moving backwards
       else if (the_app->is_key_down('S') || the_app->is_key_down(key_down)){
         if (motor_velocity > -max_velocity){
           motor_velocity -= step_acceleration;
         }
       }
+
       //if the xbox controller has been connected
-      else if (xbox_controller.refresh()){
-        motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
-        rotate_axils(xbox_controller.left_analog_x);
-      }
+      //else if (xbox_controller.refresh()){
+      //  //right trigger is acceleration, left trigger is decceleration.
+      //  motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
+      //  //turn wheels based on x pos of left analog stick
+      //  rotate_axils(xbox_controller.left_analog_x);
+      //}
 
-      move_direction(motor_velocity, 10);
-
+      //if no force is being applied - lets create some fake friction and slow down the car
       if (motor_velocity != 0){
         if (motor_velocity > 0.0f){
           motor_velocity -= step_acceleration / 5;
@@ -185,8 +187,10 @@ namespace octet {
         if (motor_velocity < 0.0f){
           motor_velocity += step_acceleration / 5;
         }
-        move_direction(motor_velocity, 10);
       }
+
+      move_direction(motor_velocity, 10);
+
       //close the progam
       if (the_app->is_key_down(key_esc))
       {
@@ -197,7 +201,8 @@ namespace octet {
     //used to control the car
     void move_direction(float motor_velocity, float motor_impulse_limit){
       for (int i = 0; i != 4; ++i){
-        axils[i]->activate(true);
+        //optimize bullet simulation - don't want to waste memory on simulating static object
+        axils[i]->activate(true); 
         hingeAW[i]->enableAngularMotor(true, motor_velocity, motor_impulse_limit);
       }
     }
