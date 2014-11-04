@@ -15,6 +15,7 @@ namespace octet {
     btDiscreteDynamicsWorld *the_world;
 
   private:
+
     dynarray<btRigidBody*> vehicles;
     dynarray<btRigidBody*> wheels;
     dynarray<btRigidBody*> axils;

@@ -12,6 +12,7 @@
 #include "../../octet.h"
 #include "xbox_controller.h"
 #include "vehicle.h"
+#include "skybox.h"
 #include "wreck_game.h"
 
 
