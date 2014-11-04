@@ -10,6 +10,7 @@ namespace octet {
 
     vehicle vehicle_instance;
     race_track race_track;
+    create_shape shape_creator;
 
     collada_builder loader;
 
@@ -88,10 +89,11 @@ namespace octet {
       app_scene->get_camera_instance(0)->set_far_plane(20000);
       app_scene->get_camera_instance(0)->get_node()->access_nodeToParent().translate(0.0f, 3.0f, 20.0f);
       
+      shape_creator.init(this, *&app_scene, *&world);
       //create the race track
-      race_track.init(this, *&app_scene, *&world);
+      race_track.init();
       //create the car
-      vehicle_instance.init(this, *&app_scene, *&world);
+      //vehicle_instance.init(this, *&app_scene, *&world);
 
       mat4t modelToWorld;
       material *floor_mat = new material(new image("assets/floor.jpg"));
@@ -102,7 +104,9 @@ namespace octet {
     void draw_world(int x, int y, int w, int h) {
 
     //update the car and the camera attached to the chassis
-      vehicle_instance.update(camAngle);
+
+      shape_creator.update(camAngle);
+      vehicle_instance.update();
 
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
