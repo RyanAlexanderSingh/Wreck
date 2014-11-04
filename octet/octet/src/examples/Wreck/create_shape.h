@@ -6,8 +6,8 @@
 //
 namespace octet {
 
-  ///Class to create a race_track using hinges
-  class race_track : public resource {
+  ///Class to create a create_shape using hinges
+  class create_shape : public resource {
 
     app *the_app;
     visual_scene *app_scene;
@@ -15,11 +15,11 @@ namespace octet {
 
   private:
 
-    dynarray<btRigidBody*> race_tracks;
+    dynarray<btRigidBody*> create_shapes;
 
 
   public:
-    race_track()
+    create_shape()
     {
     }
 
@@ -60,18 +60,9 @@ namespace octet {
 
     void update(){
 
-      /*btCollisionObjectArray &array = the_world->getCollisionObjectArray();
-      for (int i = 0; i != array.size(); ++i) {
-        btCollisionObject *co = array[i];
-        scene_node *track_nodes = (scene_node *)co->getUserPointer();
-        if (track_nodes){
-          mat4t &mat = track_nodes->access_nodeToParent();
-          co->getWorldTransform().getOpenGLMatrix(mat.get());
-        }
-      }*/
     }
 
-    ~race_track() {
+    ~create_shape() {
     }
   };
 }
