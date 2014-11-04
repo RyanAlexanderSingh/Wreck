@@ -8,9 +8,10 @@ namespace octet {
   /// Scene using bullet for physics effects.
   class wreck_game : public app {
 
-    vehicle vehicle_instance;
-    race_track race_track;
     create_shape shape_creator;
+    //vehicle vehicle_instance;
+    race_track race_track;
+    
 
     collada_builder loader;
 
@@ -106,11 +107,12 @@ namespace octet {
     //update the car and the camera attached to the chassis
 
       shape_creator.update(camAngle);
-      vehicle_instance.update();
+      //vehicle_instance.update();
 
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
+
       world->stepSimulation(1.0f / 30, 1, 1.0f / 30);
 
       // update matrices. assume 30 fps.

@@ -14,7 +14,7 @@ namespace octet {
     btDiscreteDynamicsWorld *the_world;
 
   private:
-
+    mat4t modelToWorld;
     dynarray<btRigidBody*> create_shapes;
 
 
@@ -24,15 +24,15 @@ namespace octet {
     }
 
     //this is a simple version of the function - creating a shape with no mass, useful for race tracks
-    void shape_generator(mat4t_in track_size, mesh *msh, material *mtl){
-
+    void shape_generator(mat4t_in modelToWorld, mesh *msh, material *mtl){
+      
       scene_node *track_nodes = new scene_node();
-      track_nodes->access_nodeToParent() = track_size;
+      track_nodes->access_nodeToParent() = modelToWorld;
       app_scene->add_child(track_nodes);
       app_scene->add_mesh_instance(new mesh_instance(track_nodes, msh, mtl));
 
-      btMatrix3x3 matrix(get_btMatrix3x3(track_size));
-      btVector3 pos(get_btVector3(track_size[3].xyz()));
+      btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
+      btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
       btCollisionShape *shape = msh->get_bullet_shape();
 
       btTransform transform(matrix, pos);
@@ -69,6 +69,13 @@ namespace octet {
       this->the_app = app;
       this->app_scene = app_scene;
       this->the_world = world;  
+
+      mat4t modelToWorld;
+      modelToWorld.translate(0, 2, 3);
+      //create our texture here for the road
+      material *track_mat = new material(vec4(0, 0, 0, 1));
+      shape_generator(modelToWorld, new mesh_box(vec3(200.0f, 0.5f, 200.0f)), track_mat);
+
     }
 
     void update(vec3 camera_angles){

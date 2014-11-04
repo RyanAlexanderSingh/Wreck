@@ -21,12 +21,12 @@ namespace octet {
     }
 
     void init(){
-
       mat4t modelToWorld;
+      modelToWorld.translate(0, 2, 3);
       //create our texture here for the road
       material *track_mat = new material(vec4(0, 0, 0, 1));
 
-      shape_creator.shape_generator(modelToWorld, new mesh_box(vec3(200.0f, 0.5f, 200.0f)), track_mat);
+      //shape_creator.shape_generator(modelToWorld, new mesh_box(vec3(200.0f, 0.5f, 200.0f)), track_mat);
     }
 
     ~race_track() {
