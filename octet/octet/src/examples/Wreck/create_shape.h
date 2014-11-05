@@ -26,10 +26,10 @@ namespace octet {
     //this is a simple version of the function - creating a shape with no mass, useful for race tracks
     void shape_generator(mat4t_in modelToWorld, mesh *msh, material *mtl){
       
-      scene_node *track_nodes = new scene_node();
-      track_nodes->access_nodeToParent() = modelToWorld;
-      app_scene->add_child(track_nodes);
-      app_scene->add_mesh_instance(new mesh_instance(track_nodes, msh, mtl));
+      scene_node *node = new scene_node();
+      node->access_nodeToParent() = modelToWorld;
+      app_scene->add_child(node);
+      app_scene->add_mesh_instance(new mesh_instance(node, msh, mtl));
 
       btMatrix3x3 matrix(get_btMatrix3x3(modelToWorld));
       btVector3 pos(get_btVector3(modelToWorld[3].xyz()));
@@ -41,7 +41,7 @@ namespace octet {
       shape->calculateLocalInertia(0.0f, inertiaTensor);
       btRigidBody *track = new btRigidBody(0.0f, motionState, shape, inertiaTensor);
       the_world->addRigidBody(track);
-      track->setUserPointer(track_nodes);
+      track->setUserPointer(node);
     }
 
     void shape_generator(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, bool is_dynamic, btScalar mass){

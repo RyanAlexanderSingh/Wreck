@@ -88,7 +88,7 @@ namespace octet {
 
           //check to see if the left analog stick is in the deadzone
           if (!analog_deadzone((float)controller_state.Gamepad.sThumbLX, (float)controller_state.Gamepad.sThumbLY)){
-            left_analog_x = map_values((float)controller_state.Gamepad.sThumbLX, -32768, 32768, -0.139626, 0.139626);
+            left_analog_x = map_values((float)controller_state.Gamepad.sThumbLX, -32768, 32768, -0.261799, 0.261799);
           }
 
           //check to see if the right analog stick is in the deadzone

@@ -11,7 +11,6 @@
 
 #include "../../octet.h"
 #include "xbox_controller.h"
-#include "create_shape.h"
 #include "vehicle.h"
 #include "race_track.h"
 #include "skybox.h"

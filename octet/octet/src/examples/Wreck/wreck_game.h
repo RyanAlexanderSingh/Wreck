@@ -8,9 +8,9 @@ namespace octet {
   /// Scene using bullet for physics effects.
   class wreck_game : public app {
 
-    create_shape shape_creator;
-    //vehicle vehicle_instance;
     race_track race_track;
+    vehicle vehicle_instance;
+    
     
 
     collada_builder loader;
@@ -90,14 +90,12 @@ namespace octet {
       app_scene->get_camera_instance(0)->set_far_plane(20000);
       app_scene->get_camera_instance(0)->get_node()->access_nodeToParent().translate(0.0f, 3.0f, 20.0f);
       
-      shape_creator.init(this, *&app_scene, *&world);
       //create the race track
-      race_track.init();
-      //create the car
-      //vehicle_instance.init(this, *&app_scene, *&world);
+      race_track.init(this, *&app_scene, *&world);
 
-      mat4t modelToWorld;
-      material *floor_mat = new material(new image("assets/floor.jpg"));
+      //create the car
+      vehicle_instance.init(this, *&app_scene, *&world);
+      
     }
 
 
@@ -106,14 +104,44 @@ namespace octet {
 
     //update the car and the camera attached to the chassis
 
-      shape_creator.update(camAngle);
-      //vehicle_instance.update();
+      vehicle_instance.update();
 
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
 
       world->stepSimulation(1.0f / 30, 1, 1.0f / 30);
+
+      //update the car
+      btCollisionObjectArray &array = world->getCollisionObjectArray();
+      for (int i = 0; i != array.size(); ++i) {
+        btCollisionObject *co = array[i];
+        scene_node *vehicle_nodes = (scene_node *)co->getUserPointer();
+        if (vehicle_nodes) {
+          if (i == 6){ //the chassis
+            scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
+            vehicle_nodes->add_child(cameraNode);
+            mat4t &cameraMatrix = cameraNode->access_nodeToParent();
+            cameraNode->loadIdentity();
+            cameraMatrix.translate(-30, 14, 0);
+            //if (xbox_controller.refresh()){
+            //camera_angles.x() = xbox_controller.right_analog_x;
+            //camera_angles.y() = xbox_controller.right_analog_y;
+            //}
+            //cameraMatrix.rotateY180();
+            //default positions - facing camera
+            cameraMatrix.rotateY(270.0f);
+            cameraMatrix.rotateX(-20);
+            if (is_key_down('X')){
+              cameraMatrix.rotateY(camAngle.x());
+              cameraMatrix.rotateX(camAngle.y() - 30);
+            }
+
+          }
+          mat4t &mat = vehicle_nodes->access_nodeToParent();
+          co->getWorldTransform().getOpenGLMatrix(mat.get());
+        }
+      }
 
       // update matrices. assume 30 fps.
       app_scene->update(1.0f / 30);
