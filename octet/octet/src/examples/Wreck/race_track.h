@@ -42,6 +42,7 @@ namespace octet {
       track->setFriction(10);
       the_world->addRigidBody(track);
       track->setUserPointer(track_nodes);
+
     }
 
 
@@ -63,15 +64,20 @@ namespace octet {
       create_track_component(modelToWorld, new mesh_box(vec3(70.0f, 0.5f, 10.0f)), track_mat);
       modelToWorld.translate(0.0f, 0.0f, 20.0f);
       create_track_component(modelToWorld, new mesh_box(vec3(70.0f, 0.5f, 10.0f)), track_mat);
-      modelToWorld.rotateX(-20);
+      modelToWorld.rotateX(-10);
       modelToWorld.translate(65.0f, 0.0f, 0.0f);
       create_track_component(modelToWorld, new mesh_box(vec3(20.0f, 0.5f, 10.0f)), track_mat);
+      //deadend on the left hand side to the ramp
       mat4t deadend = modelToWorld;
-      deadend.rotateX(-70);
-      deadend.translate(20.0, 20.0f, 0.0f);
+      deadend.rotateX(-80);
+      deadend.translate(40.0, 20.0f, 0.0f);
       material *deadend_mat = new material(new image("assets/deadend.jpg"));
-      create_track_component(deadend, new mesh_box(vec3(5.0f, 20.0f, 10.0f)), deadend_mat);
-    
+      create_track_component(deadend, new mesh_box(vec3(5.0f, 50.0f, 10.0f)), deadend_mat);
+      modelToWorld.rotateX(10);
+      modelToWorld.translate(59.5f, 3.45f, 0.0f);
+      create_track_component(modelToWorld, new mesh_box(vec3(40.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateY(-90);
+      modelToWorld.translate
     }
 
     void update(){

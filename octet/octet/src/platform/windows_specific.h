@@ -179,7 +179,7 @@ namespace octet {
 
       SetWindowPos(window_handle, 0, xPos, yPos, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
-      ShowWindow (window_handle, SW_SHOW);
+      ShowWindow (window_handle, SW_MAXIMIZE);
       UpdateWindow (window_handle);
     }
 

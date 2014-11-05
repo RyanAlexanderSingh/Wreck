@@ -5,8 +5,6 @@ namespace octet {
 
   class xbox_controller : public resource {
 
-  private:
-
     //current controller state
     XINPUT_STATE controller_state;
 

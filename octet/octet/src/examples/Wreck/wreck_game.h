@@ -10,10 +10,6 @@ namespace octet {
 
     race_track race_track;
     vehicle vehicle_instance;
-    
-    
-
-    collada_builder loader;
 
     // scene for drawing box
     ref<visual_scene> app_scene;
@@ -112,13 +108,13 @@ namespace octet {
 
       world->stepSimulation(1.0f / 30, 1, 1.0f / 30);
 
-      //update the car
+      //update the rigid bodies
       btCollisionObjectArray &array = world->getCollisionObjectArray();
       for (int i = 0; i != array.size(); ++i) {
         btCollisionObject *co = array[i];
         scene_node *vehicle_nodes = (scene_node *)co->getUserPointer();
         if (vehicle_nodes) {
-          if (i == 6){ //the chassis
+          if (i == 7){ //the chassis
             scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
             vehicle_nodes->add_child(cameraNode);
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
@@ -128,7 +124,6 @@ namespace octet {
             //camera_angles.x() = xbox_controller.right_analog_x;
             //camera_angles.y() = xbox_controller.right_analog_y;
             //}
-            //cameraMatrix.rotateY180();
             //default positions - facing camera
             cameraMatrix.rotateY(270.0f);
             cameraMatrix.rotateX(-20);

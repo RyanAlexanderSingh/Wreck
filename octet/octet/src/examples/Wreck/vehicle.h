@@ -10,11 +10,10 @@ namespace octet {
   class vehicle : public resource {
 
     xbox_controller xbox_controller;
+
     app *the_app;
     visual_scene *app_scene;
     btDiscreteDynamicsWorld *the_world;
-
-  private:
 
     dynarray<btRigidBody*> vehicles;
     dynarray<btRigidBody*> wheels;
