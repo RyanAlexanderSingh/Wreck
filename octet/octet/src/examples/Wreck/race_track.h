@@ -16,8 +16,7 @@ namespace octet {
   private:
 
     dynarray<btRigidBody*> race_tracks;
-
-
+    
   public:
     race_track()
     {
@@ -42,7 +41,6 @@ namespace octet {
       track->setFriction(10);
       the_world->addRigidBody(track);
       track->setUserPointer(track_nodes);
-
     }
 
 
@@ -77,11 +75,42 @@ namespace octet {
       modelToWorld.translate(59.5f, 3.45f, 0.0f);
       create_track_component(modelToWorld, new mesh_box(vec3(40.0f, 0.5f, 10.0f)), track_mat);
       modelToWorld.rotateY(-90);
-      modelToWorld.translate
+      modelToWorld.translate(60.0f, 0.0f, -50.0f);
+      create_track_component(modelToWorld, new mesh_box(vec3(70.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateY(90);
+      modelToWorld.translate(40.0f, 0.0f, 60.0f);
+      create_track_component(modelToWorld, new mesh_box(vec3(30.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateY(90);
+      modelToWorld.translate(5.0f, 0.0f, 40.0f);
+      create_track_component(modelToWorld, new mesh_box(vec3(15.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateZ(10);
+      modelToWorld.translate(50.0f, -2.0f, 0.0);
+      create_track_component(modelToWorld, new mesh_box(vec3(50.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateZ(-10);
+      modelToWorld.translate(98.8f, 8.6f, 0.0);
+      create_track_component(modelToWorld, new mesh_box(vec3(50.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateZ(-15);
+      modelToWorld.translate(88.0f, 13.0f, 0.0);
+      create_track_component(modelToWorld, new mesh_box(vec3(40.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateZ(15);
+      modelToWorld.translate(60.0f, -10.0f, 0.0);
+      create_track_component(modelToWorld, new mesh_box(vec3(30.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateY(-90);
+      modelToWorld.translate(-70.0f, 0.0f, -40.0f);
+      create_track_component(modelToWorld, new mesh_box(vec3(80.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateY(90);
+      modelToWorld.translate(-30.0f, 0.0f, -70.0f);
+      create_track_component(modelToWorld, new mesh_box(vec3(20.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateY(-90);
+      modelToWorld.translate(-100.0f, 0.0f, 30.0f);
+      create_track_component(modelToWorld, new mesh_box(vec3(110.0f, 0.5f, 10.0f)), track_mat);
+      modelToWorld.rotateY(-90);
+      modelToWorld.rotateZ(-3.5);
+      modelToWorld.translate(12.0f, 0.75f, 74.55f);
+      create_track_component(modelToWorld, new mesh_box(vec3(20.0f, 0.5f, 10.0f)), track_mat);
     }
 
     void update(){
-
       
     }
 

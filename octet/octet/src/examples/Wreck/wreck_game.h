@@ -90,10 +90,8 @@ namespace octet {
       race_track.init(this, *&app_scene, *&world);
 
       //create the car
-      vehicle_instance.init(this, *&app_scene, *&world);
-      
+      vehicle_instance.init(this, *&app_scene, *&world); 
     }
-
 
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
@@ -101,6 +99,8 @@ namespace octet {
     //update the car and the camera attached to the chassis
 
       vehicle_instance.update();
+
+      race_track.update();
 
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
@@ -114,13 +114,14 @@ namespace octet {
         btCollisionObject *co = array[i];
         scene_node *vehicle_nodes = (scene_node *)co->getUserPointer();
         if (vehicle_nodes) {
-          if (i == 7){ //the chassis
+          if (i == 18){ //the chassis
             scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
             vehicle_nodes->add_child(cameraNode);
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
             cameraNode->loadIdentity();
             cameraMatrix.translate(-30, 14, 0);
             //if (xbox_controller.refresh()){
+
             //camera_angles.x() = xbox_controller.right_analog_x;
             //camera_angles.y() = xbox_controller.right_analog_y;
             //}

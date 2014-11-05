@@ -16,7 +16,6 @@ namespace octet {
     btDiscreteDynamicsWorld *the_world;
 
     dynarray<btRigidBody*> vehicles;
-    dynarray<btRigidBody*> wheels;
     dynarray<btRigidBody*> axils;
 
     //Axil-Wheel Hinges
@@ -30,6 +29,9 @@ namespace octet {
     float motor_velocity = 0.0f;
 
   public:
+
+    dynarray<btRigidBody*> wheels;
+
     vehicle()
     {
     }
@@ -81,8 +83,8 @@ namespace octet {
       material *wheel_mat = new material(new image("assets/tire.jpg"));
       material *red = new material(vec4(1, 0, 0, 1));
 
-      for (int i = 0; i != 4; ++i){
-        modelToWorld.translate(i, 0, 0);
+      for (float i = 0.0f; i != 4; ++i){
+        modelToWorld.translate(i, 0.0f, 0.0f);
         create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, true, 5.0f);
         create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 20.0f);
       }
@@ -143,9 +145,9 @@ namespace octet {
       //if the xbox controller has been connected
       else if (xbox_controller.refresh()){
         //right trigger is acceleration, left trigger is decceleration.
-         motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
+        motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
         //turn wheels based on x pos of left analog stick
-         rotate_axils(xbox_controller.left_analog_x);
+        rotate_axils(xbox_controller.left_analog_x);
       }
 
       //if no force is being applied - lets create some fake friction and slow down the car

@@ -1,6 +1,5 @@
 #include <Xinput.h>
 
-
 namespace octet {
 
   class xbox_controller : public resource {
@@ -10,6 +9,8 @@ namespace octet {
 
     //index of the gamepad
     int controller_index;
+    int A = 0; //action button A
+    
 
   public:
 
@@ -19,6 +20,7 @@ namespace octet {
     float left_analog_y = 0.0f;
     float right_analog_x = 0.0f;
     float right_analog_y = 0.0f;
+    
 
     xbox_controller()
     {
@@ -71,6 +73,27 @@ namespace octet {
       }
     }
 
+    bool button_a_pressed(){
+      if (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_A){
+        return true;
+      }
+      else
+      {
+        return false;
+      } 
+    }
+
+    bool button_b_pressed(){
+      if (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_B){
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+
     bool refresh(){
         if (controller_index == -1){
           is_connected();
@@ -86,7 +109,7 @@ namespace octet {
 
           //check to see if the left analog stick is in the deadzone
           if (!analog_deadzone((float)controller_state.Gamepad.sThumbLX, (float)controller_state.Gamepad.sThumbLY)){
-            left_analog_x = map_values((float)controller_state.Gamepad.sThumbLX, -32768, 32768, -0.261799, 0.261799);
+            left_analog_x = map_values((float)controller_state.Gamepad.sThumbLX, -32768, 32768, -0.261799f, 0.261799f);
           }
 
           //check to see if the right analog stick is in the deadzone
