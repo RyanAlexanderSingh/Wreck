@@ -4,6 +4,7 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
+
 namespace octet {
 
   ///Class to create a race_track using hinges
@@ -12,6 +13,12 @@ namespace octet {
     app *the_app;
     visual_scene *app_scene;
     btDiscreteDynamicsWorld *the_world;
+
+    struct track_info{
+      vec3 track_size;
+      vec4 rotation;
+      vec3 translation;
+    };
 
   private:
 
@@ -50,14 +57,15 @@ namespace octet {
       this->the_world = world;
 
       mat4t modelToWorld;
-
+     
       //create our texture here for the road
       
       create_track_component(modelToWorld, new mesh_box(vec3(400.0f, 0.5f, 400.0f)), new material(new image("assets/floor.jpg")));
       material *track_mat = new material(new image("assets/road_texture.jpg"));
       modelToWorld.translate(0.0f, 2.0f, 0.0f);
       create_track_component(modelToWorld, new mesh_box(vec3(50.0f, 0.5f, 10.0f)), track_mat);
-      modelToWorld.rotateY90();
+      //modelToWorld.rotateY90();
+      modelToWorld.rotate(90, 0, 1, 0);
       modelToWorld.translate(60.0f, 0.0f, 60.0f);
       create_track_component(modelToWorld, new mesh_box(vec3(70.0f, 0.5f, 10.0f)), track_mat);
       modelToWorld.translate(0.0f, 0.0f, 20.0f);

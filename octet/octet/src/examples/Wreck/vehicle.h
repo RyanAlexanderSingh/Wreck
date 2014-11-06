@@ -10,6 +10,7 @@ namespace octet {
   class vehicle : public resource {
 
     xbox_controller xbox_controller;
+    ALsource  test;
 
     app *the_app;
     visual_scene *app_scene;
@@ -27,6 +28,18 @@ namespace octet {
     float axil_direction_limit = 0.0f;
     float target_angular_velocity = 0.0f;
     float motor_velocity = 0.0f;
+
+    //sounds
+    ALuint start_engine;
+    ALuint stop_engine;
+    ALuint loop_engine;
+
+    //sourced from Andy Thomason - Invaderers
+    unsigned cur_source;
+    ALuint sources[8];
+    ALuint get_sound_source() { return sources[cur_source++ % 8]; }
+
+    bool is_playing;
 
   public:
 
@@ -69,6 +82,11 @@ namespace octet {
       the_world->addConstraint(hingeConstraint, false);
     }
 
+    void sound_control(){
+     
+
+    }
+
     void init(app *app, visual_scene *app_scene, btDiscreteDynamicsWorld *world){
       this->the_app = app;
       this->app_scene = app_scene;
@@ -102,6 +120,11 @@ namespace octet {
       create_hinges(*&axils[2], *&wheels[2], &hingeAW, vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, 1.0f), false);
       create_hinges(*&vehicles[0], *&axils[3], &hingeCA, vec3(-dist_x, dist_y, 0.0f), vec3(0.0f, 0.0f, -dist_z), vec3(0.0f, 1.0f, 0.0f), true);
       create_hinges(*&axils[3], *&wheels[3], &hingeAW, vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 1.0f), false);
+
+      //sounds
+      loop_engine = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/loop_engine.wav");
+      cur_source = 0;
+      alGenSources(8, sources);
     }
 
     ///any 
@@ -112,6 +135,7 @@ namespace octet {
 
       const float step_angle = 1.0f;
       const float max_angle = 15.0f;
+
 
       // rotation of the front two axils - turning the chassis left or right
       if (the_app->is_key_down('A') || the_app->is_key_down(key_left)) {
@@ -175,7 +199,9 @@ namespace octet {
         //optimize bullet simulation - don't want to waste memory on simulating static object
         axils[i]->activate(true);
         hingeAW[i]->enableAngularMotor(true, motor_velocity, motor_impulse_limit);
+        sound_control();
       }
+
     }
 
     //rotate the front two axil's at an angle

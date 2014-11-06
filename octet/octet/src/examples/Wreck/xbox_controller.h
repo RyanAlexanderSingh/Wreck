@@ -73,26 +73,18 @@ namespace octet {
       }
     }
 
-    bool button_a_pressed(){
-      if (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_A){
+    //if the trigger has been pressed above the threshold - just to check if sound should be played
+    bool trigger_pressed(){
+      BYTE r_trigger_press = controller_state.Gamepad.bRightTrigger;
+      BYTE l_trigger_press = controller_state.Gamepad.bLeftTrigger;
+      
+      if (r_trigger_press || l_trigger_press > XINPUT_GAMEPAD_TRIGGER_THRESHOLD){
         return true;
       }
-      else
-      {
-        return false;
-      } 
-    }
-
-    bool button_b_pressed(){
-      if (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_B){
-        return true;
-      }
-      else
-      {
+      else{
         return false;
       }
     }
-
 
     bool refresh(){
         if (controller_index == -1){
