@@ -35,11 +35,7 @@ namespace octet {
     unsigned cur_source;
     ALuint sources[8];
     ALuint get_sound_source() { return sources[cur_source++ % 8]; }
-
-    ref<material> red;
-    ref<param_uniform> num_spots;
-    
-
+     
   public:
 
     dynarray<btRigidBody*> wheels;
@@ -114,7 +110,7 @@ namespace octet {
       vec3 axil_size(0.25f, 0.25f, 0.5f);
           
       material *wheel_mat = new material(new image("assets/tire.jpg"));
-      red = new material(vec4(1, 0, 0, 1));
+      material *red = new material(vec4(1, 0, 0, 1));
 
       for (float i = 0.0f; i != 4; ++i){
         modelToWorld.translate(i, 0.0f, 0.0f);
