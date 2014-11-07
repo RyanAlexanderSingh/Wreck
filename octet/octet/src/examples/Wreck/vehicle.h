@@ -98,9 +98,9 @@ namespace octet {
         alSourcePlay(source);
       }
       //if the vehicle is not moving, close the sound.
-      else if (motor_velocity == 0.0f || !xbox_controller.trigger_pressed()){
+      /*else if (motor_velocity == 0.0f || !xbox_controller.trigger_pressed()){
         alSourceStop(source);
-      }
+      }*/
     }
 
     void init(app *app, visual_scene *app_scene, btDiscreteDynamicsWorld *world){
@@ -172,7 +172,6 @@ namespace octet {
       if (the_app->is_key_down('W') || the_app->is_key_down(key_up)){
         if (motor_velocity < max_velocity){
           motor_velocity += step_acceleration;
-          move_direction(motor_velocity, 10);
         }
       }
 
@@ -180,27 +179,26 @@ namespace octet {
       else if (the_app->is_key_down('S') || the_app->is_key_down(key_down)){
         if (motor_velocity > -max_velocity){
           motor_velocity -= step_acceleration;
-          move_direction(motor_velocity, 10);
         }
       }
 
-      //if no force is being applied - lets create some fake friction and slow down the car
-      else if (the_app->is_key_down('W') == false || the_app->is_key_down('S') == false){
+      //if no force is being applied - setting motor_velocity to 0 will produce a fake form of friction
+      else if (!the_app->is_key_down('W') || !the_app->is_key_down('S')){
         if (motor_velocity != 0){
-          motor_velocity = 0;
+          motor_velocity = 0.0f;
         }
       }
+
+      move_direction(motor_velocity, 10);
 
       //if the xbox controller has been connected
-      else if (xbox_controller.refresh()){
+       if (xbox_controller.refresh()){
         //right trigger is acceleration, left trigger is decceleration.
         motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
         move_direction(motor_velocity, 10);
         //turn wheels based on x pos of left analog stick
         rotate_axils(xbox_controller.left_analog_x);
       }
-
-      
 
       sound_control();
 
