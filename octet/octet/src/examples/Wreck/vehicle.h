@@ -82,13 +82,23 @@ namespace octet {
       the_world->addConstraint(hingeConstraint, false);
     }
 
+    ///function in charge of controlling sound for the project. 
     void sound_control(){
+
+      unsigned source_state;
+      //get sound state of the selected sound source
+      getSourceState(loop_engine, source_state);
+
+      printf("%u \n", source_state);
       ALuint source = get_sound_source();
       alSourcei(source, AL_BUFFER, loop_engine);
-      if (motor_velocity == 0.0f || xbox_controller.trigger_pressed()){
-          alSourcePlay(source);
+
+      //if vehicle is moving in a direction, play the sound only if the sound is not already being played
+      if (source_state != AL_PLAYING && motor_velocity != 0.0f){
+        alSourcePlay(source);
       }
-      else if (!xbox_controller.trigger_pressed()){
+      //if the vehicle is not moving, close the sound.
+      else if (motor_velocity == 0.0f || !xbox_controller.trigger_pressed()){
         alSourceStop(source);
       }
     }
@@ -142,7 +152,6 @@ namespace octet {
       const float step_angle = 1.0f;
       const float max_angle = 15.0f;
 
-
       // rotation of the front two axils - turning the chassis left or right
       if (the_app->is_key_down('A') || the_app->is_key_down(key_left)) {
         if (axil_direction_limit > -(max_angle * 3.14159265f / 180.0f))
@@ -151,6 +160,7 @@ namespace octet {
           rotate_axils(axil_direction_limit);
         }
       }
+
       if (the_app->is_key_down('D') || the_app->is_key_down(key_right)) {
         if (axil_direction_limit < (max_angle * 3.14159265f / 180.0f)){
           axil_direction_limit += step_angle * 3.14159265f / 180.0f;
@@ -174,29 +184,27 @@ namespace octet {
         }
       }
 
+      //if no force is being applied - lets create some fake friction and slow down the car
+      else if (the_app->is_key_down('W') == false || the_app->is_key_down('S') == false){
+        if (motor_velocity != 0){
+          motor_velocity = 0;
+        }
+      }
+
       //if the xbox controller has been connected
       else if (xbox_controller.refresh()){
         //right trigger is acceleration, left trigger is decceleration.
         motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
+        move_direction(motor_velocity, 10);
         //turn wheels based on x pos of left analog stick
         rotate_axils(xbox_controller.left_analog_x);
-       // move_direction(motor_velocity, 10);
-      }
-
-      //if no force is being applied - lets create some fake friction and slow down the car
-      if (motor_velocity != 0){
-        if (motor_velocity > 0.0f){
-          motor_velocity -= step_acceleration / 5;
-        }
-        if (motor_velocity < 0.0f){
-          motor_velocity += step_acceleration / 5;
-        }
       }
 
       
-      
 
-      //close the progam
+      sound_control();
+
+      //close the program
       if (the_app->is_key_down(key_esc))
       {
         exit(1);
@@ -209,9 +217,7 @@ namespace octet {
         //optimize bullet simulation - don't want to waste memory on simulating static object
         axils[i]->activate(true);
         hingeAW[i]->enableAngularMotor(true, motor_velocity, motor_impulse_limit);
-        sound_control();
       }
-
     }
 
     //rotate the front two axil's at an angle

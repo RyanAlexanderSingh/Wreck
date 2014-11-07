@@ -100,8 +100,6 @@ namespace octet {
 
       vehicle_instance.update();
 
-      race_track.update();
-
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);

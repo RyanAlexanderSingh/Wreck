@@ -217,7 +217,7 @@ namespace octet {
       ref_cnt = 0;
       state = AL_STOPPED;
       sample = 0;
-      looping = 1;
+      looping = 0;
       buffer = 0;
       gain = 1;
     }
@@ -638,6 +638,14 @@ namespace octet {
     if (src) {
       src->seti(AL_SAMPLE_OFFSET, 0);
       src->seti(AL_SOURCE_STATE, AL_PLAYING);
+    }
+  }
+
+  inline void getSourceState(ALuint sid, unsigned &source_state){
+    ALCcontext *ctxt = Fake_AL_context();
+    ALsource *src = ctxt->get_source(sid);
+    if (src) {
+      source_state = src->geti(AL_SOURCE_STATE);
     }
   }
 
