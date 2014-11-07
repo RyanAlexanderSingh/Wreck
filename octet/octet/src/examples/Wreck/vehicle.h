@@ -98,9 +98,9 @@ namespace octet {
         alSourcePlay(source);
       }
       //if the vehicle is not moving, close the sound.
-      /*else if (motor_velocity == 0.0f || !xbox_controller.trigger_pressed()){
+      else if (motor_velocity == 0.0f){
         alSourceStop(source);
-      }*/
+      }
     }
 
     void init(app *app, visual_scene *app_scene, btDiscreteDynamicsWorld *world){
