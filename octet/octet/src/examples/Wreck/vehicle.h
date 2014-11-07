@@ -34,7 +34,7 @@ namespace octet {
     ALuint stop_engine;
     ALuint loop_engine;
 
-    //sourced from Andy Thomason - Invaderers
+    //sourced from Andy Thomason
     unsigned cur_source;
     ALuint sources[8];
     ALuint get_sound_source() { return sources[cur_source++ % 8]; }
@@ -83,8 +83,14 @@ namespace octet {
     }
 
     void sound_control(){
-     
-
+      ALuint source = get_sound_source();
+      alSourcei(source, AL_BUFFER, loop_engine);
+      if (motor_velocity == 0.0f || xbox_controller.trigger_pressed()){
+          alSourcePlay(source);
+      }
+      else if (!xbox_controller.trigger_pressed()){
+        alSourceStop(source);
+      }
     }
 
     void init(app *app, visual_scene *app_scene, btDiscreteDynamicsWorld *world){
@@ -156,6 +162,7 @@ namespace octet {
       if (the_app->is_key_down('W') || the_app->is_key_down(key_up)){
         if (motor_velocity < max_velocity){
           motor_velocity += step_acceleration;
+          move_direction(motor_velocity, 10);
         }
       }
 
@@ -163,6 +170,7 @@ namespace octet {
       else if (the_app->is_key_down('S') || the_app->is_key_down(key_down)){
         if (motor_velocity > -max_velocity){
           motor_velocity -= step_acceleration;
+          move_direction(motor_velocity, 10);
         }
       }
 
@@ -172,6 +180,7 @@ namespace octet {
         motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
         //turn wheels based on x pos of left analog stick
         rotate_axils(xbox_controller.left_analog_x);
+       // move_direction(motor_velocity, 10);
       }
 
       //if no force is being applied - lets create some fake friction and slow down the car
@@ -184,7 +193,8 @@ namespace octet {
         }
       }
 
-      move_direction(motor_velocity, 10);
+      
+      
 
       //close the progam
       if (the_app->is_key_down(key_esc))
