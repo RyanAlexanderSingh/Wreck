@@ -29,17 +29,16 @@ namespace octet {
     float target_angular_velocity = 0.0f;
     float motor_velocity = 0.0f;
 
-    //sounds
-    ALuint start_engine;
-    ALuint stop_engine;
-    ALuint loop_engine;
-
     //sourced from Andy Thomason
+    //sounds
+    ALuint loop_engine;
     unsigned cur_source;
     ALuint sources[8];
     ALuint get_sound_source() { return sources[cur_source++ % 8]; }
 
-    bool is_playing;
+    ref<material> red;
+    ref<param_uniform> num_spots;
+    
 
   public:
 
@@ -52,7 +51,7 @@ namespace octet {
     void create_car_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, btScalar mass){
       scene_node *vehicle_nodes = new scene_node();
       vehicle_nodes->access_nodeToParent() = axilsize;
-      app_scene->add_child(vehicle_nodes);
+      app_scene->add_child(vehicle_nodes); 
       app_scene->add_mesh_instance(new mesh_instance(vehicle_nodes, msh, mtl));
       btMatrix3x3 matrix(get_btMatrix3x3(axilsize));
       btVector3 pos(get_btVector3(axilsize[3].xyz()));
@@ -89,7 +88,7 @@ namespace octet {
       //get sound state of the selected sound source
       getSourceState(loop_engine, source_state);
 
-      printf("%u \n", source_state);
+      //printf("%u \n", source_state);
       ALuint source = get_sound_source();
       alSourcei(source, AL_BUFFER, loop_engine);
 
@@ -112,10 +111,10 @@ namespace octet {
       modelToWorld.translate(0.0f, 5.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
       create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, 5.0f);
-
       vec3 axil_size(0.25f, 0.25f, 0.5f);
+          
       material *wheel_mat = new material(new image("assets/tire.jpg"));
-      material *red = new material(vec4(1, 0, 0, 1));
+      red = new material(vec4(1, 0, 0, 1));
 
       for (float i = 0.0f; i != 4; ++i){
         modelToWorld.translate(i, 0.0f, 0.0f);

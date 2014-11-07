@@ -83,7 +83,7 @@ namespace octet {
       app_scene = new visual_scene();
       app_scene->create_default_camera_and_lights();
       app_scene->get_camera_instance(0)->set_near_plane(1);
-      app_scene->get_camera_instance(0)->set_far_plane(20000);
+      app_scene->get_camera_instance(0)->set_far_plane(2000);
       app_scene->get_camera_instance(0)->get_node()->access_nodeToParent().translate(0.0f, 3.0f, 20.0f);
       
       //create the race track

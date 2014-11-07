@@ -59,16 +59,27 @@ namespace octet {
       
       //create the fake skybox
       mat4t skybox_m;
-      skybox_m.rotateX(-90);
-      material *skybox_mat = new material(new image("assets/skybox.jpg"));
-      create_track_component(skybox_m, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 600.0f, 100.0f)), skybox_mat, false);
+      //skybox_m.rotateX(-90);
+      material *skybox_mat = new material(new image("assets/seamless_sky.jpg"));
+      create_track_component(skybox_m, new mesh_box(vec3(500.0f, 200.0f, 500.0f)), skybox_mat, false);
+
+      //create the roads
       mat4t modelToWorld;
       //create our texture here for the road
       create_track_component(modelToWorld, new mesh_box(vec3(400.0f, 0.5f, 400.0f)), new material(new image("assets/floor.jpg")), true);
       material *track_mat = new material(new image("assets/road_texture.jpg"));
+      
+      /*dynarray<unsigned char> file;
+      app_utils::get_url(file, "assets/race_track.txt");
+      for (unsigned i = 0; i != file.size(); ++i){
+        unsigned c = file[i];
+        if (c != 62){
+          printf("%i \n", c);
+        }
+      }*/
+
       modelToWorld.translate(0.0f, 2.0f, 0.0f);
       create_track_component(modelToWorld, new mesh_box(vec3(50.0f, 0.5f, 10.0f)), track_mat, true);
-      //modelToWorld.rotateY90();
       modelToWorld.rotate(90, 0, 1, 0);
       modelToWorld.translate(60.0f, 0.0f, 60.0f);
       create_track_component(modelToWorld, new mesh_box(vec3(70.0f, 0.5f, 10.0f)), track_mat, true);
