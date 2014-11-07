@@ -49,7 +49,7 @@ namespace octet {
     {
     }
 
-    void create_car_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, bool is_dynamic, btScalar mass){
+    void create_car_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, btScalar mass){
       scene_node *vehicle_nodes = new scene_node();
       vehicle_nodes->access_nodeToParent() = axilsize;
       app_scene->add_child(vehicle_nodes);
@@ -111,7 +111,7 @@ namespace octet {
       mat4t modelToWorld;
       modelToWorld.translate(0.0f, 5.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
-      create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, true, 5.0f);
+      create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, 5.0f);
 
       vec3 axil_size(0.25f, 0.25f, 0.5f);
       material *wheel_mat = new material(new image("assets/tire.jpg"));
@@ -119,8 +119,8 @@ namespace octet {
 
       for (float i = 0.0f; i != 4; ++i){
         modelToWorld.translate(i, 0.0f, 0.0f);
-        create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, true, 5.0f);
-        create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, true, 20.0f);
+        create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, 5.0f);
+        create_car_component(modelToWorld, new mesh_box(axil_size), red, &axils, 20.0f);
       }
 
       float dist_x = chassis_size.x() - axil_size.x() * 2.0f;

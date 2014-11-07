@@ -119,7 +119,6 @@ namespace octet {
             cameraNode->loadIdentity();
             cameraMatrix.translate(-30, 14, 0);
             //if (xbox_controller.refresh()){
-
             //camera_angles.x() = xbox_controller.right_analog_x;
             //camera_angles.y() = xbox_controller.right_analog_y;
             //}
