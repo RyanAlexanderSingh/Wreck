@@ -49,7 +49,7 @@ namespace octet {
 
       //create the fake skybox
       mat4t skybox_m;
-      material *skybox_mat = new material(new image("assets/seamless_sky.jpg"));
+      material *skybox_mat = new material(new image("assets/seamles_skybox.jpg"));
       create_track_component(skybox_m, new mesh_box(vec3(500.0f, 200.0f, 500.0f)), skybox_mat, false);
       
       mat4t modelToWorld;
@@ -85,7 +85,6 @@ namespace octet {
           //put all the stored information in as a newline approaches
           if (c == 10){
             track_specifications.push_back('\0'); //null terminate the buffer 
-            //printf("%f", track_specifications[10]);
             modelToWorld.rotate(track_specifications[0], track_specifications[1], track_specifications[2], track_specifications[3]);
             modelToWorld.translate(track_specifications[4], track_specifications[5], track_specifications[6]);
             create_track_component(modelToWorld, new mesh_box(vec3(track_specifications[7], track_specifications[8], track_specifications[9])), track_mat, true);
