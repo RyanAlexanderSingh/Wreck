@@ -9,8 +9,6 @@ namespace octet {
 
     //index of the gamepad
     int controller_index;
-    int A = 0; //action button A
-    
 
   public:
 
@@ -20,12 +18,10 @@ namespace octet {
     float left_analog_y = 0.0f;
     float right_analog_x = 0.0f;
     float right_analog_y = 0.0f;
-    
 
     xbox_controller()
     {
     }
-
 
     XINPUT_GAMEPAD *get_state(){
       return &controller_state.Gamepad;
@@ -52,7 +48,7 @@ namespace octet {
     }
 
     bool analog_deadzone(float analog_stick_x, float analog_stick_y){
-      
+
       float check_analog_x = analog_stick_x;
       float check_analog_y = analog_stick_y;
 
@@ -66,7 +62,7 @@ namespace octet {
       if (check_analog_y > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE || check_analog_y < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE){
         return false;
       }
-      
+
       //else it is in the deadzone, return true
       else{
         return true;
@@ -77,7 +73,7 @@ namespace octet {
     bool trigger_pressed(){
       BYTE r_trigger_press = controller_state.Gamepad.bRightTrigger;
       BYTE l_trigger_press = controller_state.Gamepad.bLeftTrigger;
-      
+
       if (r_trigger_press || l_trigger_press > XINPUT_GAMEPAD_TRIGGER_THRESHOLD){
         return true;
       }
@@ -87,36 +83,36 @@ namespace octet {
     }
 
     bool refresh(){
-        if (controller_index == -1){
-          is_connected();
-        }
-        if (controller_index != -1)
-        {
-          ZeroMemory(&controller_state, sizeof(XINPUT_STATE));
-          if (XInputGetState(controller_index, &controller_state) != ERROR_SUCCESS)
-          {
-            controller_index = -1;
-            return false;
-          }
-
-          //check to see if the left analog stick is in the deadzone
-          if (!analog_deadzone((float)controller_state.Gamepad.sThumbLX, (float)controller_state.Gamepad.sThumbLY)){
-            left_analog_x = map_values((float)controller_state.Gamepad.sThumbLX, -32768, 32768, -0.261799f, 0.261799f);
-          }
-
-          //check to see if the right analog stick is in the deadzone
-          if (!analog_deadzone((float)controller_state.Gamepad.sThumbRX, (float)controller_state.Gamepad.sThumbRY)){
-            right_analog_x = map_values((float)controller_state.Gamepad.sThumbRX, -32768, 32768, -180, 180);
-            right_analog_y = map_values((float)controller_state.Gamepad.sThumbRY, -32768, 32768, 180, -180);
-          }
-          
-          left_trigger = map_values((float)controller_state.Gamepad.bLeftTrigger, 0.0f, 255.0f, 0.0f, 20.0f);
-          right_trigger = map_values((float)controller_state.Gamepad.bRightTrigger, 0.0f, 255.0f, 0.0f, 20.0f);
-          return true;
-       }
-       return false;
+      if (controller_index == -1){
+        is_connected();
       }
-        ~xbox_controller() {
+      if (controller_index != -1)
+      {
+        ZeroMemory(&controller_state, sizeof(XINPUT_STATE));
+        if (XInputGetState(controller_index, &controller_state) != ERROR_SUCCESS)
+        {
+          controller_index = -1;
+          return false;
         }
-      };
+
+        //check to see if the left analog stick is in the deadzone
+        if (!analog_deadzone((float)controller_state.Gamepad.sThumbLX, (float)controller_state.Gamepad.sThumbLY)){
+          left_analog_x = map_values((float)controller_state.Gamepad.sThumbLX, -32768, 32768, -0.261799f, 0.261799f);
+        }
+
+        //check to see if the right analog stick is in the deadzone
+        if (!analog_deadzone((float)controller_state.Gamepad.sThumbRX, (float)controller_state.Gamepad.sThumbRY)){
+          right_analog_x = map_values((float)controller_state.Gamepad.sThumbRX, -32768, 32768, -180, 180);
+          right_analog_y = map_values((float)controller_state.Gamepad.sThumbRY, -32768, 32768, 180, -180);
+        }
+
+        left_trigger = map_values((float)controller_state.Gamepad.bLeftTrigger, 0.0f, 255.0f, 0.0f, 20.0f);
+        right_trigger = map_values((float)controller_state.Gamepad.bRightTrigger, 0.0f, 255.0f, 0.0f, 20.0f);
+        return true;
+      }
+      return false;
     }
+    ~xbox_controller() {
+    }
+  };
+}

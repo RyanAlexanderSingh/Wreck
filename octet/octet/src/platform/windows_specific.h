@@ -178,8 +178,8 @@ namespace octet {
       int yPos = (GetSystemMetrics(SM_CYSCREEN) - rect.bottom) / 2;
 
       SetWindowPos(window_handle, 0, xPos, yPos, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-
-      ShowWindow (window_handle, SW_MAXIMIZE);
+      //SW_MAXIMIZE
+      ShowWindow (window_handle, SW_SHOW);
       UpdateWindow (window_handle);
     }
 

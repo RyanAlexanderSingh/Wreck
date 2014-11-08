@@ -10,7 +10,6 @@ namespace octet {
   class vehicle : public resource {
 
     xbox_controller xbox_controller;
-    ALsource  test;
 
     app *the_app;
     visual_scene *app_scene;
@@ -35,7 +34,7 @@ namespace octet {
     unsigned cur_source;
     ALuint sources[8];
     ALuint get_sound_source() { return sources[cur_source++ % 8]; }
-     
+
   public:
 
     dynarray<btRigidBody*> wheels;
@@ -47,7 +46,7 @@ namespace octet {
     void create_car_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, btScalar mass){
       scene_node *vehicle_nodes = new scene_node();
       vehicle_nodes->access_nodeToParent() = axilsize;
-      app_scene->add_child(vehicle_nodes); 
+      app_scene->add_child(vehicle_nodes);
       app_scene->add_mesh_instance(new mesh_instance(vehicle_nodes, msh, mtl));
       btMatrix3x3 matrix(get_btMatrix3x3(axilsize));
       btVector3 pos(get_btVector3(axilsize[3].xyz()));
@@ -108,7 +107,7 @@ namespace octet {
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
       create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, 5.0f);
       vec3 axil_size(0.25f, 0.25f, 0.5f);
-          
+
       material *wheel_mat = new material(new image("assets/tire.jpg"));
       material *red = new material(vec4(1, 0, 0, 1));
 
@@ -187,7 +186,7 @@ namespace octet {
       move_direction(motor_velocity, 10);
 
       //if the xbox controller has been connected
-       if (xbox_controller.refresh()){
+      if (xbox_controller.refresh()){
         //right trigger is acceleration, left trigger is decceleration.
         motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
         move_direction(motor_velocity, 10);
