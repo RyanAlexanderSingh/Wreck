@@ -95,9 +95,7 @@ namespace octet {
 
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
-
-    //update the car and the camera attached to the chassis
-
+      //keyboard inputs - car movement with keyboard and xbox controller
       vehicle_instance.update();
 
       int vx = 0, vy = 0;
@@ -112,7 +110,7 @@ namespace octet {
         btCollisionObject *co = array[i];
         scene_node *vehicle_nodes = (scene_node *)co->getUserPointer();
         if (vehicle_nodes) {
-          if (i == 17){ //the chassis
+          if (i == 7){ //the chassis
             scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
             vehicle_nodes->add_child(cameraNode);
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
@@ -129,13 +127,11 @@ namespace octet {
               cameraMatrix.rotateY(camAngle.x());
               cameraMatrix.rotateX(camAngle.y() - 30);
             }
-
           }
           mat4t &mat = vehicle_nodes->access_nodeToParent();
           co->getWorldTransform().getOpenGLMatrix(mat.get());
         }
       }
-
       // update matrices. assume 30 fps.
       app_scene->update(1.0f / 30);
       // draw the scene

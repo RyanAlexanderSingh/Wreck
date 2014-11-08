@@ -5,9 +5,6 @@
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 
-#include <stdio.h>
-#include <stdlib.h>
-
 namespace octet {
 
   ///Class to create a race_track using hinges
@@ -16,8 +13,6 @@ namespace octet {
     app *the_app;
     visual_scene *app_scene;
     btDiscreteDynamicsWorld *the_world;
-
-  private:
 
   public:
     race_track()
@@ -56,19 +51,17 @@ namespace octet {
       mat4t skybox_m;
       material *skybox_mat = new material(new image("assets/seamless_sky.jpg"));
       create_track_component(skybox_m, new mesh_box(vec3(500.0f, 200.0f, 500.0f)), skybox_mat, false);
-
-      //create the roads
+      
       mat4t modelToWorld;
       //create our texture here for the road
       create_track_component(modelToWorld, new mesh_box(vec3(400.0f, 0.5f, 400.0f)), new material(new image("assets/floor.jpg")), true);
-      material *track_mat = new material(new image("assets/road_texture.jpg"));
-
+      
       dynarray<unsigned char> file;
       app_utils::get_url(file, "assets/race_track.txt");
-
       dynarray<char> track_variable;
       dynarray<float> track_specifications;
-
+      material *track_mat = new material(new image("assets/road_texture.jpg"));
+      //create the roads & barriers
       for (unsigned i = 0; i != file.size(); ++i){
         unsigned c = file[i];
         //33 in UTF-8 represents an exclaimation mark, our breakpoint for reading the whole file
@@ -79,6 +72,7 @@ namespace octet {
           }
           //94 represents change material to barrier(^)
           if (c == 94){
+            modelToWorld.loadIdentity();
             track_mat = new material(new image("assets/deadend.jpg"));
           }
           if (c == 44){
@@ -91,7 +85,7 @@ namespace octet {
           //put all the stored information in as a newline approaches
           if (c == 10){
             track_specifications.push_back('\0'); //null terminate the buffer 
-            printf("%f", track_specifications[10]);
+            //printf("%f", track_specifications[10]);
             modelToWorld.rotate(track_specifications[0], track_specifications[1], track_specifications[2], track_specifications[3]);
             modelToWorld.translate(track_specifications[4], track_specifications[5], track_specifications[6]);
             create_track_component(modelToWorld, new mesh_box(vec3(track_specifications[7], track_specifications[8], track_specifications[9])), track_mat, true);
@@ -99,10 +93,6 @@ namespace octet {
           }
         }
       }
-    }
-
-    void update(){
-
     }
 
     ~race_track() {

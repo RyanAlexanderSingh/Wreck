@@ -18,6 +18,8 @@ namespace octet {
     dynarray<btRigidBody*> vehicles;
     dynarray<btRigidBody*> axils;
 
+    scene_node *chassis;
+
     //Axil-Wheel Hinges
     dynarray<btHingeConstraint*> hingeAW;
 
@@ -106,6 +108,8 @@ namespace octet {
       modelToWorld.translate(0.0f, 5.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
       create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, 5.0f);
+      //vehicles[0]->setUserPointer(chassis);
+
       vec3 axil_size(0.25f, 0.25f, 0.5f);
 
       material *wheel_mat = new material(new image("assets/tire.jpg"));
