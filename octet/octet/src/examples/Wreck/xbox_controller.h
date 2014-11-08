@@ -8,7 +8,9 @@
 #include <Xinput.h>
 
 namespace octet {
-    ///Class for getting the input from an xbox controller using XInput.h
+    /// Class for getting the input from an Xbox controller.
+  /** The class is called to check if an Xbox controller is connected and if it is, get various inputs from it.
+  Currently, the only inputs that are being checked are the left trigger, right trigger and the left analog stick. */
   class xbox_controller : public resource {
 
     //current controller state
@@ -18,7 +20,7 @@ namespace octet {
     int controller_index;
 
   public:
-
+    
     float left_trigger = 0.0f;
     float right_trigger = 0.0f;
     float left_analog_x = 0.0f;
