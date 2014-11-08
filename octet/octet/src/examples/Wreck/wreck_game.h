@@ -10,6 +10,7 @@ namespace octet {
 
     race_track race_track;
     vehicle vehicle_instance;
+    xbox_controller xbox_controller;
 
     // scene for drawing box
     ref<visual_scene> app_scene;
@@ -110,16 +111,12 @@ namespace octet {
         btCollisionObject *co = array[i];
         scene_node *vehicle_nodes = (scene_node *)co->getUserPointer();
         if (vehicle_nodes) {
-          if (i == 7){ //the chassis
+          if (i == 49){ //the chassis - shouldn't programatically assign camera
             scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
             vehicle_nodes->add_child(cameraNode);
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
             cameraNode->loadIdentity();
             cameraMatrix.translate(-30, 14, 0);
-            //if (xbox_controller.refresh()){
-            //camera_angles.x() = xbox_controller.right_analog_x;
-            //camera_angles.y() = xbox_controller.right_analog_y;
-            //}
             //default positions - facing camera
             cameraMatrix.rotateY(270.0f);
             cameraMatrix.rotateX(-20);

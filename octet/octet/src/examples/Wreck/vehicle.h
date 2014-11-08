@@ -18,8 +18,6 @@ namespace octet {
     dynarray<btRigidBody*> vehicles;
     dynarray<btRigidBody*> axils;
 
-    scene_node *chassis;
-
     //Axil-Wheel Hinges
     dynarray<btHingeConstraint*> hingeAW;
 
@@ -78,7 +76,8 @@ namespace octet {
       the_world->addConstraint(hingeConstraint, false);
     }
 
-    ///function in charge of controlling sound for the project. 
+    ///Function to play sound when the vehicle is moving. 
+    ///sound_control gets the source state of 
     void sound_control(){
 
       unsigned source_state;
@@ -140,10 +139,13 @@ namespace octet {
       alGenSources(8, sources);
     }
 
-    ///any 
+    ///Update the vehicle class every frame, called from the main app wreck_game. 
+    ///Update takes care of the keyboard inputs and checks if an xbox controller has been connected.
+    ///Keyboard inputs and the Xbox controller will not work together and keyboard inputs are taken as default. 
+    ///If an Xbox controller is found then the inputs from the xbox controller are taken instead.
     void update(){
 
-      const float step_acceleration = 0.2f;
+      const float step_acceleration = 0.4f;
       const float max_velocity = 20.0f;
 
       const float step_angle = 1.0f;
@@ -206,7 +208,9 @@ namespace octet {
       }
     }
 
-    //used to control the car
+    ///Move the vehicle by setting a velocity on the hinge angular motors. To move the vehicle,
+    ///all 4 axils are activated and the angular motor on all Axil-Wheel hinge constraints are enabled. 
+    ///a motor velocity and a maximum impulse is then set to the hinge.
     void move_direction(float motor_velocity, float motor_impulse_limit){
       for (int i = 0; i != 4; ++i){
         //optimize bullet simulation - don't want to waste memory on simulating static object
@@ -215,7 +219,9 @@ namespace octet {
       }
     }
 
-    //rotate the front two axil's at an angle
+    ///Function to take in the radian at which to turn the vehicle. The vehicle is turned 
+    ///by activating the front two axils in the scene and applying an angular rotation
+    ///on the free angle in the Chassis-Axil hinge constraints
     void rotate_axils(float axil_direction_limit){
       for (int i = 0; i != 2; ++i){
         axils[i]->activate(true);

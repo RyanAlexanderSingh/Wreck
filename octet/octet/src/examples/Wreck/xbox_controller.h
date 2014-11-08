@@ -1,7 +1,14 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Ryan Singh 
+//
+// xbox_controller.h - responsible for providing inputs from an xbox_controller
+// 
+
 #include <Xinput.h>
 
 namespace octet {
-
+    ///Class for getting the input from an xbox controller using XInput.h
   class xbox_controller : public resource {
 
     //current controller state
@@ -16,17 +23,17 @@ namespace octet {
     float right_trigger = 0.0f;
     float left_analog_x = 0.0f;
     float left_analog_y = 0.0f;
-    float right_analog_x = 0.0f;
-    float right_analog_y = 0.0f;
 
     xbox_controller()
     {
     }
 
+    ///returns the current state of the xbox controller
     XINPUT_GAMEPAD *get_state(){
       return &controller_state.Gamepad;
     }
 
+    ///returns true if an xbox controller is connected, returning the id of the controller (1-4)
     bool is_connected()
     {
       int controllerId = -1;
@@ -42,11 +49,12 @@ namespace octet {
       return controllerId != -1;
     }
 
-    //adapted from the Arduino Map function
+    ///map_values allows the mapping of two values from the xbox controller, useful for specfic desired values
     float map_values(float x, float in_min, float in_max, float out_min, float out_max){
       return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
+    ///returns whether or not the analog values are within thumbpad deadzone 
     bool analog_deadzone(float analog_stick_x, float analog_stick_y){
 
       float check_analog_x = analog_stick_x;
@@ -69,7 +77,7 @@ namespace octet {
       }
     }
 
-    //if the trigger has been pressed above the threshold - just to check if sound should be played
+    ///return whether or not a trigger has been pressed, returns true if left or right has been pressed.
     bool trigger_pressed(){
       BYTE r_trigger_press = controller_state.Gamepad.bRightTrigger;
       BYTE l_trigger_press = controller_state.Gamepad.bLeftTrigger;
@@ -82,6 +90,7 @@ namespace octet {
       }
     }
 
+    ///check to see if a device is connected and updates values accordingly, returns false if device is not connected, equivalent to an update function.
     bool refresh(){
       if (controller_index == -1){
         is_connected();
@@ -99,20 +108,11 @@ namespace octet {
         if (!analog_deadzone((float)controller_state.Gamepad.sThumbLX, (float)controller_state.Gamepad.sThumbLY)){
           left_analog_x = map_values((float)controller_state.Gamepad.sThumbLX, -32768, 32768, -0.261799f, 0.261799f);
         }
-
-        //check to see if the right analog stick is in the deadzone
-        if (!analog_deadzone((float)controller_state.Gamepad.sThumbRX, (float)controller_state.Gamepad.sThumbRY)){
-          right_analog_x = map_values((float)controller_state.Gamepad.sThumbRX, -32768, 32768, -180, 180);
-          right_analog_y = map_values((float)controller_state.Gamepad.sThumbRY, -32768, 32768, 180, -180);
-        }
-
         left_trigger = map_values((float)controller_state.Gamepad.bLeftTrigger, 0.0f, 255.0f, 0.0f, 20.0f);
         right_trigger = map_values((float)controller_state.Gamepad.bRightTrigger, 0.0f, 255.0f, 0.0f, 20.0f);
         return true;
       }
       return false;
-    }
-    ~xbox_controller() {
     }
   };
 }
