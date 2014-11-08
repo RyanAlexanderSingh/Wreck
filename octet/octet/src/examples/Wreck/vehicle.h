@@ -1,32 +1,33 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2014
+// Ryan Singh 2014
 //
-// Modular Framework for OpenGLES2 rendering on multiple platforms.
-//
+// vehicle.h - class creates a vehicle with a chassis, 4 axils and 4 wheels
+// 
+
 namespace octet {
 
-  ///Class to create a vehicle using hinges
+  ///Class to create a vehicle using hinge constraints
+  /** Class will create a vehicle out of rigid bodies. The vehicle consists of a chassis, 4 axils and 4 wheels.
+      They are attached using hinge constraints. There are 2 hinge constraint relationships, Chassis-Axils and Axils-Wheels.
+  */
   class vehicle : public resource {
 
     xbox_controller xbox_controller;
 
     app *the_app;
     visual_scene *app_scene;
-    btDiscreteDynamicsWorld *the_world;
+    btDiscreteDynamicsWorld *the_world; 
 
-    dynarray<btRigidBody*> vehicles;
-    dynarray<btRigidBody*> axils;
+    dynarray<btRigidBody*> vehicles; //only one in array - should change
+    dynarray<btRigidBody*> axils; //axil array - used to connect hinges and activate physics when movement occurs
+    dynarray<btRigidBody*> wheels; //wheel array - used to connect hinges 
 
-    //Axil-Wheel Hinges
-    dynarray<btHingeConstraint*> hingeAW;
+    dynarray<btHingeConstraint*> hingeAW; //Axil-Wheel Hinges
+    dynarray<btHingeConstraint*> hingeCA; //Chassis-Axil Hinges
 
-    //Chassis-Axil Hinges
-    dynarray<btHingeConstraint*> hingeCA;
-
-    float axil_direction_limit = 0.0f;
-    float target_angular_velocity = 0.0f;
-    float motor_velocity = 0.0f;
+    float axil_direction_limit = 0.0f; //limit the axil can rotate in radians
+    float motor_velocity = 0.0f; //speed in which the vehicle will move
 
     //sourced from Andy Thomason
     //sounds
@@ -34,15 +35,14 @@ namespace octet {
     unsigned cur_source;
     ALuint sources[8];
     ALuint get_sound_source() { return sources[cur_source++ % 8]; }
-
+    
   public:
-
-    dynarray<btRigidBody*> wheels;
 
     vehicle()
     {
     }
 
+    ///Function to create a car component, assigning a rigid body array and a mass.
     void create_car_component(mat4t_in axilsize, mesh *msh, material *mtl, dynarray <btRigidBody*> *rbArray, btScalar mass){
       scene_node *vehicle_nodes = new scene_node();
       vehicle_nodes->access_nodeToParent() = axilsize;
@@ -62,29 +62,35 @@ namespace octet {
       rbArray->push_back(component);
     }
 
+    ///Creates the hinge constraints between two rigid bodies. 
+    /** Function takes in two rigid bodies, the hinge constraint it should be pushed back into, the pivots of the objects(position in local space to connect constraint),
+    the axis in which the hinge constraint has freedom and a bool to check whether or not hinge limits should be applied. Hinge limits only applicable for Chassis-Axil hinge for rotation.
+    */
     void create_hinges(btRigidBody *rbA, btRigidBody *rbB, dynarray <btHingeConstraint*> *hinge_array, vec3_in PivotA, vec3_in PivotB, vec3_in Axis, bool set_hinge_limits){
 
-      btVector3 btPivotA = get_btVector3(PivotA);
-      btVector3 btPivotB = get_btVector3(PivotB);
-      btVector3 btAxis = get_btVector3(Axis);
+      btVector3 btPivotA = get_btVector3(PivotA); //btVector3 of first rigid body pivot
+      btVector3 btPivotB = get_btVector3(PivotB); //btVector3 of second rigid body pivot
+      btVector3 btAxis = get_btVector3(Axis); //axis on which hinge constraint has freedome
 
       btHingeConstraint *hingeConstraint = new btHingeConstraint((*rbA), (*rbB), btPivotA, btPivotB, btAxis, btAxis);
       if (set_hinge_limits){
-        hingeConstraint->setLimit(0.0f, 0.0f);
+        hingeConstraint->setLimit(0.0f, 0.0f); //init the hinge constraint to 0 - can change when steering the vehicle
       }
       hinge_array->push_back(hingeConstraint);
-      the_world->addConstraint(hingeConstraint, false);
+      the_world->addConstraint(hingeConstraint, false); //do not disable collision between rigid bodies or they will ignore each other (very bad)
     }
 
     ///Function to play sound when the vehicle is moving. 
-    ///sound_control gets the source state of 
+    /**sound_control gets the source state of selected source and returns it state
+      if a sound file is not playing and the motor_velocity(movement) is != 0.0 then play a sound file.
+    */
     void sound_control(){
 
-      unsigned source_state;
+      unsigned source_state; //state of the selected source
       //get sound state of the selected sound source
       getSourceState(loop_engine, source_state);
 
-      //printf("%u \n", source_state);
+      //init the sound
       ALuint source = get_sound_source();
       alSourcei(source, AL_BUFFER, loop_engine);
 
@@ -92,12 +98,15 @@ namespace octet {
       if (source_state != AL_PLAYING && motor_velocity != 0.0f){
         alSourcePlay(source);
       }
-      //if the vehicle is not moving, close the sound.
+      //if the vehicle is not moving, stop the sound.
       else if (motor_velocity == 0.0f){
         alSourceStop(source);
       }
     }
-
+    
+    //Init the vehicle by creating the rigid bodies and attaching the hinge constraints
+    /** Creates the meshes and rigid bodies for the chassis, 4 axils and 4 wheels. Creates the hinge constraints for each of these rigid bodies.
+    */
     void init(app *app, visual_scene *app_scene, btDiscreteDynamicsWorld *world){
       this->the_app = app;
       this->app_scene = app_scene;
@@ -145,11 +154,11 @@ namespace octet {
     ///If an Xbox controller is found then the inputs from the xbox controller are taken instead.
     void update(){
 
-      const float step_acceleration = 0.4f;
-      const float max_velocity = 20.0f;
+      const float step_acceleration = 0.4f; //float to increment motor_velocity
+      const float max_velocity = 20.0f; //maximum velocity the vehicle can go
 
-      const float step_angle = 1.0f;
-      const float max_angle = 15.0f;
+      const float step_angle = 1.5f; //float to increment the angle axils turn
+      const float max_angle = 15.0f; //maximum angle the axil can rotate
 
       // rotation of the front two axils - turning the chassis left or right
       if (the_app->is_key_down('A') || the_app->is_key_down(key_left)) {
@@ -204,13 +213,13 @@ namespace octet {
       //close the program
       if (the_app->is_key_down(key_esc))
       {
-        exit(1);
+        exit(1); //exits the program....safely?
       }
     }
 
-    ///Move the vehicle by setting a velocity on the hinge angular motors. To move the vehicle,
-    ///all 4 axils are activated and the angular motor on all Axil-Wheel hinge constraints are enabled. 
-    ///a motor velocity and a maximum impulse is then set to the hinge.
+    ///Move the vehicle by setting a velocity on the hinge angular motors. 
+    /** To move the vehicle, all 4 axils are activated and the angular motor on all Axil-Wheel hinge constraints are enabled. 
+    a motor velocity and a maximum impulse is then set to the hinge. */
     void move_direction(float motor_velocity, float motor_impulse_limit){
       for (int i = 0; i != 4; ++i){
         //optimize bullet simulation - don't want to waste memory on simulating static object
@@ -219,11 +228,12 @@ namespace octet {
       }
     }
 
-    ///Function to take in the radian at which to turn the vehicle. The vehicle is turned 
-    ///by activating the front two axils in the scene and applying an angular rotation
-    ///on the free angle in the Chassis-Axil hinge constraints
+    ///Function to take in the radian at which to turn the vehicle. 
+    /** The vehicle is turned by activating the front two axils in the scene and applying an angular rotation
+    on the free angle in the Chassis-Axil hinge constraints */
     void rotate_axils(float axil_direction_limit){
       for (int i = 0; i != 2; ++i){
+        //optimize bullet simulation - don't want to waste memory on simulating static object
         axils[i]->activate(true);
         hingeCA[i]->setLimit(axil_direction_limit, axil_direction_limit);
       }

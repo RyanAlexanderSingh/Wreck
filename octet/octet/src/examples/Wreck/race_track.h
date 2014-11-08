@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Ryan Singh 
+// Ryan Singh 2014
 //
 // race_track.h - class creates a race track with rigid bodies from reading in a .txt file
 // 
