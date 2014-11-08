@@ -1,0 +1,155 @@
+\hypertarget{classoctet_1_1xbox__controller}{\section{octet\+:\+:xbox\+\_\+controller Class Reference}
+\label{classoctet_1_1xbox__controller}\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+}
+
+
+Class for getting the input from an Xbox controller.  
+
+
+
+
+{\ttfamily \#include $<$xbox\+\_\+controller.\+h$>$}
+
+Inheritance diagram for octet\+:\+:xbox\+\_\+controller\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classoctet_1_1xbox__controller}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classoctet_1_1xbox__controller_a23dae5b93d48b45fee3d992b1afed77b}{xbox\+\_\+controller} ()
+\item 
+X\+I\+N\+P\+U\+T\+\_\+\+G\+A\+M\+E\+P\+A\+D $\ast$ \hyperlink{classoctet_1_1xbox__controller_a3a2a6b8a5ab904bf5bbb20538a7326ce}{get\+\_\+state} ()
+\begin{DoxyCompactList}\small\item\em returns the current state of the xbox controller \end{DoxyCompactList}\item 
+bool \hyperlink{classoctet_1_1xbox__controller_ab6fc7aad7d4c37e56511bb87dff70459}{is\+\_\+connected} ()
+\begin{DoxyCompactList}\small\item\em returns true if an xbox controller is connected, returning the id of the controller (1-\/4) \end{DoxyCompactList}\item 
+float \hyperlink{classoctet_1_1xbox__controller_aaf78537caeec8411d12a39a7c2f6b90c}{map\+\_\+values} (float x, float in\+\_\+min, float in\+\_\+max, float out\+\_\+min, float out\+\_\+max)
+\begin{DoxyCompactList}\small\item\em map\+\_\+values allows the mapping of two values from the xbox controller, useful for specfic desired values \end{DoxyCompactList}\item 
+bool \hyperlink{classoctet_1_1xbox__controller_a418d767e949defcf6df7769bf41310ab}{analog\+\_\+deadzone} (float analog\+\_\+stick\+\_\+x, float analog\+\_\+stick\+\_\+y)
+\begin{DoxyCompactList}\small\item\em returns whether or not the analog values are within thumbpad deadzone \end{DoxyCompactList}\item 
+bool \hyperlink{classoctet_1_1xbox__controller_a668a207c0d9c9391efe7c39ba48c11c5}{trigger\+\_\+pressed} ()
+\begin{DoxyCompactList}\small\item\em return whether or not a trigger has been pressed, returns true if left or right has been pressed. \end{DoxyCompactList}\item 
+bool \hyperlink{classoctet_1_1xbox__controller_afa8298b80294785c3b320ccc6c6e51bd}{refresh} ()
+\begin{DoxyCompactList}\small\item\em check to see if a device is connected and updates values accordingly, returns false if device is not connected, equivalent to an update function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+float \hyperlink{classoctet_1_1xbox__controller_a1860e2290b33fa35c7b57f6ceaa78881}{left\+\_\+trigger} = 0.\+0f
+\item 
+float \hyperlink{classoctet_1_1xbox__controller_a8406f69ac00c5ee2107e2fbea7980cd3}{right\+\_\+trigger} = 0.\+0f
+\item 
+float \hyperlink{classoctet_1_1xbox__controller_a4155ad43e820b46bdc1d4bced4d232ab}{left\+\_\+analog\+\_\+x} = 0.\+0f
+\item 
+float \hyperlink{classoctet_1_1xbox__controller_aaa5d7e08fd31b573ad296357619284d3}{left\+\_\+analog\+\_\+y} = 0.\+0f
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class for getting the input from an Xbox controller. 
+
+The class is called to check if an Xbox controller is connected and if it is, get various inputs from it. Currently, the only inputs that are being checked are the left trigger, right trigger and the left analog stick. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classoctet_1_1xbox__controller_a23dae5b93d48b45fee3d992b1afed77b}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!xbox\+\_\+controller@{xbox\+\_\+controller}}
+\index{xbox\+\_\+controller@{xbox\+\_\+controller}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{xbox\+\_\+controller}]{\setlength{\rightskip}{0pt plus 5cm}octet\+::xbox\+\_\+controller\+::xbox\+\_\+controller (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_a23dae5b93d48b45fee3d992b1afed77b}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classoctet_1_1xbox__controller_a418d767e949defcf6df7769bf41310ab}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!analog\+\_\+deadzone@{analog\+\_\+deadzone}}
+\index{analog\+\_\+deadzone@{analog\+\_\+deadzone}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{analog\+\_\+deadzone}]{\setlength{\rightskip}{0pt plus 5cm}bool octet\+::xbox\+\_\+controller\+::analog\+\_\+deadzone (
+\begin{DoxyParamCaption}
+\item[{float}]{analog\+\_\+stick\+\_\+x, }
+\item[{float}]{analog\+\_\+stick\+\_\+y}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_a418d767e949defcf6df7769bf41310ab}
+
+
+returns whether or not the analog values are within thumbpad deadzone 
+
+\hypertarget{classoctet_1_1xbox__controller_a3a2a6b8a5ab904bf5bbb20538a7326ce}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!get\+\_\+state@{get\+\_\+state}}
+\index{get\+\_\+state@{get\+\_\+state}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{get\+\_\+state}]{\setlength{\rightskip}{0pt plus 5cm}X\+I\+N\+P\+U\+T\+\_\+\+G\+A\+M\+E\+P\+A\+D$\ast$ octet\+::xbox\+\_\+controller\+::get\+\_\+state (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_a3a2a6b8a5ab904bf5bbb20538a7326ce}
+
+
+returns the current state of the xbox controller 
+
+\hypertarget{classoctet_1_1xbox__controller_ab6fc7aad7d4c37e56511bb87dff70459}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!is\+\_\+connected@{is\+\_\+connected}}
+\index{is\+\_\+connected@{is\+\_\+connected}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{is\+\_\+connected}]{\setlength{\rightskip}{0pt plus 5cm}bool octet\+::xbox\+\_\+controller\+::is\+\_\+connected (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_ab6fc7aad7d4c37e56511bb87dff70459}
+
+
+returns true if an xbox controller is connected, returning the id of the controller (1-\/4) 
+
+\hypertarget{classoctet_1_1xbox__controller_aaf78537caeec8411d12a39a7c2f6b90c}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!map\+\_\+values@{map\+\_\+values}}
+\index{map\+\_\+values@{map\+\_\+values}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{map\+\_\+values}]{\setlength{\rightskip}{0pt plus 5cm}float octet\+::xbox\+\_\+controller\+::map\+\_\+values (
+\begin{DoxyParamCaption}
+\item[{float}]{x, }
+\item[{float}]{in\+\_\+min, }
+\item[{float}]{in\+\_\+max, }
+\item[{float}]{out\+\_\+min, }
+\item[{float}]{out\+\_\+max}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_aaf78537caeec8411d12a39a7c2f6b90c}
+
+
+map\+\_\+values allows the mapping of two values from the xbox controller, useful for specfic desired values 
+
+\hypertarget{classoctet_1_1xbox__controller_afa8298b80294785c3b320ccc6c6e51bd}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!refresh@{refresh}}
+\index{refresh@{refresh}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{refresh}]{\setlength{\rightskip}{0pt plus 5cm}bool octet\+::xbox\+\_\+controller\+::refresh (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_afa8298b80294785c3b320ccc6c6e51bd}
+
+
+check to see if a device is connected and updates values accordingly, returns false if device is not connected, equivalent to an update function. 
+
+\hypertarget{classoctet_1_1xbox__controller_a668a207c0d9c9391efe7c39ba48c11c5}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!trigger\+\_\+pressed@{trigger\+\_\+pressed}}
+\index{trigger\+\_\+pressed@{trigger\+\_\+pressed}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{trigger\+\_\+pressed}]{\setlength{\rightskip}{0pt plus 5cm}bool octet\+::xbox\+\_\+controller\+::trigger\+\_\+pressed (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_a668a207c0d9c9391efe7c39ba48c11c5}
+
+
+return whether or not a trigger has been pressed, returns true if left or right has been pressed. 
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classoctet_1_1xbox__controller_a4155ad43e820b46bdc1d4bced4d232ab}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!left\+\_\+analog\+\_\+x@{left\+\_\+analog\+\_\+x}}
+\index{left\+\_\+analog\+\_\+x@{left\+\_\+analog\+\_\+x}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{left\+\_\+analog\+\_\+x}]{\setlength{\rightskip}{0pt plus 5cm}float octet\+::xbox\+\_\+controller\+::left\+\_\+analog\+\_\+x = 0.\+0f}}\label{classoctet_1_1xbox__controller_a4155ad43e820b46bdc1d4bced4d232ab}
+\hypertarget{classoctet_1_1xbox__controller_aaa5d7e08fd31b573ad296357619284d3}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!left\+\_\+analog\+\_\+y@{left\+\_\+analog\+\_\+y}}
+\index{left\+\_\+analog\+\_\+y@{left\+\_\+analog\+\_\+y}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{left\+\_\+analog\+\_\+y}]{\setlength{\rightskip}{0pt plus 5cm}float octet\+::xbox\+\_\+controller\+::left\+\_\+analog\+\_\+y = 0.\+0f}}\label{classoctet_1_1xbox__controller_aaa5d7e08fd31b573ad296357619284d3}
+\hypertarget{classoctet_1_1xbox__controller_a1860e2290b33fa35c7b57f6ceaa78881}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!left\+\_\+trigger@{left\+\_\+trigger}}
+\index{left\+\_\+trigger@{left\+\_\+trigger}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{left\+\_\+trigger}]{\setlength{\rightskip}{0pt plus 5cm}float octet\+::xbox\+\_\+controller\+::left\+\_\+trigger = 0.\+0f}}\label{classoctet_1_1xbox__controller_a1860e2290b33fa35c7b57f6ceaa78881}
+\hypertarget{classoctet_1_1xbox__controller_a8406f69ac00c5ee2107e2fbea7980cd3}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!right\+\_\+trigger@{right\+\_\+trigger}}
+\index{right\+\_\+trigger@{right\+\_\+trigger}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
+\subsubsection[{right\+\_\+trigger}]{\setlength{\rightskip}{0pt plus 5cm}float octet\+::xbox\+\_\+controller\+::right\+\_\+trigger = 0.\+0f}}\label{classoctet_1_1xbox__controller_a8406f69ac00c5ee2107e2fbea7980cd3}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Projects/\+Wreck/octet/octet/src/examples/\+Wreck/\hyperlink{xbox__controller_8h}{xbox\+\_\+controller.\+h}\end{DoxyCompactItemize}
