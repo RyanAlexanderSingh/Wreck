@@ -112,7 +112,7 @@ namespace octet {
         btCollisionObject *co = array[i];
         scene_node *vehicle_nodes = (scene_node *)co->getUserPointer();
         if (vehicle_nodes) {
-          if (i == 18){ //the chassis
+          if (i == 17){ //the chassis
             scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
             vehicle_nodes->add_child(cameraNode);
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
