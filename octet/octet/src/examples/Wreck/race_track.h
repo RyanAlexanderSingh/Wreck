@@ -49,7 +49,7 @@ namespace octet {
 
       //create the fake skybox
       mat4t skybox_m;
-      material *skybox_mat = new material(new image("assets/seamles_skybox.jpg"));
+      material *skybox_mat = new material(new image("assets/seamless_sky.jpg"));
       create_track_component(skybox_m, new mesh_box(vec3(500.0f, 200.0f, 500.0f)), skybox_mat, false);
       
       mat4t modelToWorld;
