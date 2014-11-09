@@ -165,7 +165,7 @@ namespace octet {
       create_hinges(*&axils[3], *&wheels[3], &hingeAW, vec3(0.0f, 0.0f, 0.575f), vec3(0.0f, 0.0f, -0.575f), vec3(0.0f, 0.0f, 1.0f), false);
 
       //sounds
-      loop_engine = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/loop_engine.wav");
+      loop_engine = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/engine_loop.wav");
       cur_source = 0;
       alGenSources(8, sources);
     }
