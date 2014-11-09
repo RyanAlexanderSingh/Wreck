@@ -92,7 +92,6 @@ namespace octet {
     ///Function to play sound when the vehicle is moving. 
     /// sound_control gets the source state of selected source and returns it state
     /// if a sound file is not playing and the motor_velocity(movement) is != 0.0 then play a sound file.
-
     void sound_control(){
 
       unsigned source_state; //state of the selected source

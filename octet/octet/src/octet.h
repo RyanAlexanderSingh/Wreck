@@ -139,10 +139,8 @@
   #endif
 
   // high level helpers (layer2)
-  #include "helpers/mouse_ball.h"
-  #include "helpers/http_server.h"
   #include "helpers/text_overlay.h"
-  #include "helpers/object_picker.h"
+
 
   // asset loaders
   #include "loaders/collada_builder.h"
