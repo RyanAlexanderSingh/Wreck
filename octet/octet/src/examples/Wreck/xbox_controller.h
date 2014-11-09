@@ -72,7 +72,25 @@ namespace octet {
       if (check_analog_y > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE || check_analog_y < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE){
         return false;
       }
+      //else it is in the deadzone, return true
+      else{
+        return true;
+      }
+    }
 
+    ///returns whether or a trigger is in the deadzone
+    bool trigger_deadzone(){
+
+      BYTE left_trigger = controller_state.Gamepad.bLeftTrigger;
+      BYTE right_trigger = controller_state.Gamepad.bRightTrigger;
+
+      //trigger deadzone is all the same
+      if (left_trigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD || left_trigger < -XINPUT_GAMEPAD_TRIGGER_THRESHOLD){
+        return false;
+      }
+      if (right_trigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD || right_trigger < -XINPUT_GAMEPAD_TRIGGER_THRESHOLD){
+        return false;
+      }
       //else it is in the deadzone, return true
       else{
         return true;

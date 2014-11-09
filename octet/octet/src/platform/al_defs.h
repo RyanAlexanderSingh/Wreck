@@ -217,7 +217,7 @@ namespace octet {
       ref_cnt = 0;
       state = AL_STOPPED;
       sample = 0;
-      looping = 0;
+      looping = 1;
       buffer = 0;
       gain = 1;
     }

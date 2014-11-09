@@ -193,7 +193,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        btCollisionObject *co = array[i];</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        scene_node *vehicle_nodes = (scene_node *)co-&gt;getUserPointer();</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <span class="keywordflow">if</span> (vehicle_nodes) {</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;          <span class="keywordflow">if</span> (i == 48){ <span class="comment">//the chassis - shouldn&#39;t programatically assign camera</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;          <span class="keywordflow">if</span> (i == 49){ <span class="comment">//the chassis - shouldn&#39;t programatically assign camera</span></div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            scene_node *cameraNode = app_scene-&gt;get_camera_instance(0)-&gt;get_node();</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            vehicle_nodes-&gt;add_child(cameraNode);</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            mat4t &amp;cameraMatrix = cameraNode-&gt;access_nodeToParent();</div>
@@ -236,7 +236,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Nov 9 2014 11:22:02 for Wreck by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Nov 9 2014 14:10:04 for Wreck by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

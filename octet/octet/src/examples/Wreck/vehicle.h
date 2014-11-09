@@ -41,7 +41,9 @@ namespace octet {
     ALuint sources[8];
     ALuint get_sound_source() { return sources[cur_source++ % 8]; }
 
-    bool key_down_last_frame = false;
+    bool last_frame_key_m = false;
+    bool is_sound_playing = false;
+    bool play_audio = false;
     bool mute = false; //to mute the audio playing;
 
   public:
@@ -102,7 +104,7 @@ namespace octet {
       alSourcei(source, AL_BUFFER, loop_engine);
 
       //if vehicle is moving in a direction, play the sound only if the sound is not already being played
-      if (source_state != AL_PLAYING && motor_velocity != 0.0f && !mute){
+      if (motor_velocity != 0.0f && !mute && play_audio){
         alSourcePlay(source);
       }
       //if the vehicle is not moving, stop the sound.
@@ -180,7 +182,7 @@ namespace octet {
       const float step_angle = 1.5f; //float to increment the angle axils turn
       const float max_angle = 15.0f; //maximum angle the axil can rotate
 
-     // write some text to the overlay
+      // write some text to the overlay
 
       text->clear();
 
@@ -253,12 +255,18 @@ namespace octet {
         }
       }
       //mute sound
-      if (the_app->is_key_down('M') && !key_down_last_frame)
+      if (the_app->is_key_down('M') && !last_frame_key_m)
       {
         mute = !mute;
       }
 
-        sound_control();
+      if (!is_sound_playing && (the_app->is_key_down('W') || the_app->is_key_down('S') || !xbox_controller.trigger_deadzone())) {
+        play_audio = true;
+      }
+      else{
+        play_audio = false;
+      }
+      sound_control();
 
       //close the program
       if (the_app->is_key_down(key_esc))
@@ -266,7 +274,9 @@ namespace octet {
         exit(1); //exits the program....safely?
       }
 
-      key_down_last_frame = the_app->is_key_down('M');
+      is_sound_playing = the_app->is_key_down('W') || the_app->is_key_down('S') || !xbox_controller.trigger_deadzone();
+      last_frame_key_m = the_app->is_key_down('M');
+      
     }
 
     ///Move the vehicle by setting a velocity on the hinge angular motors. 
