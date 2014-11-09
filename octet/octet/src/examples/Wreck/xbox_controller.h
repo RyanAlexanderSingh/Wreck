@@ -21,10 +21,10 @@ namespace octet {
 
   public:
     
-    float left_trigger = 0.0f;
-    float right_trigger = 0.0f;
-    float left_analog_x = 0.0f;
-    float left_analog_y = 0.0f;
+    float left_trigger = 0.0f; //deceleration of vehicle
+    float right_trigger = 0.0f; //acceleration of vehicle
+    float left_analog_x = 0.0f; //left analog x pos
+    float left_analog_y = 0.0f; //left analog y pos
 
     xbox_controller()
     {

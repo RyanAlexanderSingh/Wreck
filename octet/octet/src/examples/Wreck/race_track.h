@@ -62,7 +62,7 @@ namespace octet {
 
       mat4t modelToWorld;
       //create our texture here for the road
-      create_track_component(modelToWorld, new mesh_box(vec3(400.0f, 0.5f, 400.0f)), new material(new image("assets/floor.jpg")), true);
+      //create_track_component(modelToWorld, new mesh_box(vec3(400.0f, 0.5f, 400.0f)), new material(new image("assets/floor.jpg")), true);
 
       dynarray<unsigned char> file; //char array to store the contents of the file
       app_utils::get_url(file, "assets/race_track.txt");

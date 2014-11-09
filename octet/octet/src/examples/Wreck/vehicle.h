@@ -28,12 +28,21 @@ namespace octet {
     float axil_direction_limit = 0.0f; //limit the axil can rotate in radians
     float motor_velocity = 0.0f; //speed in which the vehicle will move
 
+    // helper for drawing text
+    ref<text_overlay> overlay;
+
+    // text mesh object for overlay.
+    ref<mesh_text> text;
+
     //sourced from Andy Thomason
     //sounds
     ALuint loop_engine;
     unsigned cur_source;
     ALuint sources[8];
     ALuint get_sound_source() { return sources[cur_source++ % 8]; }
+
+    bool key_down_last_frame = false;
+    bool mute = false; //to mute the audio playing;
 
   public:
 
@@ -93,11 +102,11 @@ namespace octet {
       alSourcei(source, AL_BUFFER, loop_engine);
 
       //if vehicle is moving in a direction, play the sound only if the sound is not already being played
-      if (source_state != AL_PLAYING && motor_velocity != 0.0f){
+      if (source_state != AL_PLAYING && motor_velocity != 0.0f && !mute){
         alSourcePlay(source);
       }
       //if the vehicle is not moving, stop the sound.
-      else if (motor_velocity == 0.0f){
+      else if (motor_velocity == 0.0f || mute){
         alSourceStop(source);
       }
     }
@@ -109,6 +118,19 @@ namespace octet {
       this->app_scene = app_scene;
       this->the_world = world;
 
+      // create the overlay
+      overlay = new text_overlay();
+
+      // get the defualt font.
+      bitmap_font *font = overlay->get_default_font();
+
+      // create a box containing text (in pixels)
+      aabb bb(vec3(150.5f, -400.0f, 0.0f), vec3(256, 64, 0));
+      text = new mesh_text(font, "", &bb);
+
+      // add the mesh to the overlay.
+      overlay->add_mesh_text(text);
+
       mat4t modelToWorld;
       modelToWorld.translate(0.0f, 5.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
@@ -116,7 +138,7 @@ namespace octet {
 
       vec3 axil_size(0.25f, 0.25f, 0.5f);
 
-      material *wheel_mat = new material(new image("assets/tire.jpg"));
+      material *wheel_mat = new material(new image("assets/tire_test.jpg"));
       material *red = new material(vec4(1, 0, 0, 1));
 
       //create 4 wheels and 4 axils
@@ -150,13 +172,26 @@ namespace octet {
     /// Update takes care of the keyboard inputs and checks if an xbox controller has been connected.
     ///Keyboard inputs and the Xbox controller will not work together and keyboard inputs are taken as default. 
     /// If an Xbox controller is found then the inputs from the xbox controller are taken instead. 
-    void update(){
+    void update(int vx, int vy){
 
       const float step_acceleration = 0.4f; //float to increment motor_velocity
       const float max_velocity = 20.0f; //maximum velocity the vehicle can go
 
       const float step_angle = 1.5f; //float to increment the angle axils turn
       const float max_angle = 15.0f; //maximum angle the axil can rotate
+
+      // write some text to the overlay
+      char buf[3][256];
+
+      text->clear();
+
+      text->format("Sound muted: %s", mute ? "true" : "false");
+
+      // convert it to a mesh.
+      text->update();
+
+      // draw the text overlay
+      overlay->render(vx, vy);
 
       // rotation of the front two axils - turning the chassis left or right
       if (the_app->is_key_down('A') || the_app->is_key_down(key_left)) {
@@ -219,13 +254,20 @@ namespace octet {
         }
       }
 
-      sound_control();
+      if (the_app->is_key_down('M') && !key_down_last_frame)
+      {
+        mute = !mute;
+      }
+
+        sound_control();
 
       //close the program
       if (the_app->is_key_down(key_esc))
       {
         exit(1); //exits the program....safely?
       }
+
+      key_down_last_frame = the_app->is_key_down('M');
     }
 
     ///Move the vehicle by setting a velocity on the hinge angular motors. 

@@ -95,12 +95,13 @@ namespace octet {
 
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
-      //keyboard inputs - car movement with keyboard and xbox controller
-      vehicle_instance.update();
-
+      
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
+
+      //keyboard inputs - car movement with keyboard and xbox controller
+      vehicle_instance.update(vx, vy);
 
       world->stepSimulation(1.0f / 30, 1, 1.0f / 30);
 
@@ -110,7 +111,7 @@ namespace octet {
         btCollisionObject *co = array[i];
         scene_node *vehicle_nodes = (scene_node *)co->getUserPointer();
         if (vehicle_nodes) {
-          if (i == 49){ //the chassis - shouldn't programatically assign camera
+          if (i == 48){ //the chassis - shouldn't programatically assign camera
             scene_node *cameraNode = app_scene->get_camera_instance(0)->get_node();
             vehicle_nodes->add_child(cameraNode);
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
