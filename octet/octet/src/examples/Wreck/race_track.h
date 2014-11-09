@@ -56,13 +56,9 @@ namespace octet {
       this->the_world = world;
 
       //create the fake skybox
-      mat4t skybox_m;
-      material *skybox_mat = new material(new image("assets/seamless_sky.jpg"));
-      create_track_component(skybox_m, new mesh_box(vec3(500.0f, 200.0f, 500.0f)), skybox_mat, false);
-
       mat4t modelToWorld;
-      //create our texture here for the road
-      //create_track_component(modelToWorld, new mesh_box(vec3(400.0f, 0.5f, 400.0f)), new material(new image("assets/floor.jpg")), true);
+      material *skybox_mat = new material(new image("assets/seamless_sky.jpg"));
+      create_track_component(modelToWorld, new mesh_sphere(100.0f, 400.0f, 3), skybox_mat, false);
 
       dynarray<unsigned char> file; //char array to store the contents of the file
       app_utils::get_url(file, "assets/race_track.txt");
