@@ -27,10 +27,8 @@ bool \hyperlink{classoctet_1_1xbox__controller_ab6fc7aad7d4c37e56511bb87dff70459
 \begin{DoxyCompactList}\small\item\em returns true if an xbox controller is connected, returning the id of the controller (1-\/4) \end{DoxyCompactList}\item 
 float \hyperlink{classoctet_1_1xbox__controller_aaf78537caeec8411d12a39a7c2f6b90c}{map\+\_\+values} (float x, float in\+\_\+min, float in\+\_\+max, float out\+\_\+min, float out\+\_\+max)
 \begin{DoxyCompactList}\small\item\em map\+\_\+values allows the mapping of two values from the xbox controller, useful for specfic desired values \end{DoxyCompactList}\item 
-bool \hyperlink{classoctet_1_1xbox__controller_a418d767e949defcf6df7769bf41310ab}{analog\+\_\+deadzone} (float analog\+\_\+stick\+\_\+x, float analog\+\_\+stick\+\_\+y)
-\begin{DoxyCompactList}\small\item\em returns whether or not the analog values are within thumbpad deadzone \end{DoxyCompactList}\item 
-bool \hyperlink{classoctet_1_1xbox__controller_a668a207c0d9c9391efe7c39ba48c11c5}{trigger\+\_\+pressed} ()
-\begin{DoxyCompactList}\small\item\em return whether or not a trigger has been pressed, returns true if left or right has been pressed. \end{DoxyCompactList}\item 
+bool \hyperlink{classoctet_1_1xbox__controller_a374fc9fd466a1155b44432eef1179073}{analog\+\_\+deadzone} ()
+\begin{DoxyCompactList}\small\item\em returns whether or not the analog values are in the deadzone \end{DoxyCompactList}\item 
 bool \hyperlink{classoctet_1_1xbox__controller_afa8298b80294785c3b320ccc6c6e51bd}{refresh} ()
 \begin{DoxyCompactList}\small\item\em check to see if a device is connected and updates values accordingly, returns false if device is not connected, equivalent to an update function. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Public Attributes}
@@ -62,17 +60,16 @@ The class is called to check if an Xbox controller is connected and if it is, ge
 
 
 \subsection{Member Function Documentation}
-\hypertarget{classoctet_1_1xbox__controller_a418d767e949defcf6df7769bf41310ab}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!analog\+\_\+deadzone@{analog\+\_\+deadzone}}
+\hypertarget{classoctet_1_1xbox__controller_a374fc9fd466a1155b44432eef1179073}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!analog\+\_\+deadzone@{analog\+\_\+deadzone}}
 \index{analog\+\_\+deadzone@{analog\+\_\+deadzone}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
 \subsubsection[{analog\+\_\+deadzone}]{\setlength{\rightskip}{0pt plus 5cm}bool octet\+::xbox\+\_\+controller\+::analog\+\_\+deadzone (
 \begin{DoxyParamCaption}
-\item[{float}]{analog\+\_\+stick\+\_\+x, }
-\item[{float}]{analog\+\_\+stick\+\_\+y}
+{}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_a418d767e949defcf6df7769bf41310ab}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_a374fc9fd466a1155b44432eef1179073}
 
 
-returns whether or not the analog values are within thumbpad deadzone 
+returns whether or not the analog values are in the deadzone 
 
 \hypertarget{classoctet_1_1xbox__controller_a3a2a6b8a5ab904bf5bbb20538a7326ce}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!get\+\_\+state@{get\+\_\+state}}
 \index{get\+\_\+state@{get\+\_\+state}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
@@ -121,17 +118,6 @@ map\+\_\+values allows the mapping of two values from the xbox controller, usefu
 
 
 check to see if a device is connected and updates values accordingly, returns false if device is not connected, equivalent to an update function. 
-
-\hypertarget{classoctet_1_1xbox__controller_a668a207c0d9c9391efe7c39ba48c11c5}{\index{octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}!trigger\+\_\+pressed@{trigger\+\_\+pressed}}
-\index{trigger\+\_\+pressed@{trigger\+\_\+pressed}!octet\+::xbox\+\_\+controller@{octet\+::xbox\+\_\+controller}}
-\subsubsection[{trigger\+\_\+pressed}]{\setlength{\rightskip}{0pt plus 5cm}bool octet\+::xbox\+\_\+controller\+::trigger\+\_\+pressed (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classoctet_1_1xbox__controller_a668a207c0d9c9391efe7c39ba48c11c5}
-
-
-return whether or not a trigger has been pressed, returns true if left or right has been pressed. 
 
 
 

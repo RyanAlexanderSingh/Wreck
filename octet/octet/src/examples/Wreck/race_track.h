@@ -9,10 +9,9 @@
 namespace octet {
 
   ///Class for creating a race track with rigid bodies reading a .txt file.
-  /** A race track is created by reading in a .txt file with 10 or 11 parameters.
-  The first 4 parameters is the modelToWorld rotation, the next 3 is for the translation
-  and the last 3 assign the size of the mesh box. If an 11th parameter then change the material to a road barrier.
-  */
+  ///A race track is created by reading in a .txt file with 10 or 11 parameters.
+  ///The first 4 parameters is the modelToWorld rotation, the next 3 is for the translation
+  ///and the last 3 assign the size of the mesh box. If an 11th parameter then change the material to a road barrier.
   class race_track : public resource {
 
     app *the_app;
@@ -24,9 +23,9 @@ namespace octet {
     {
     }
 
-    ///Creates a mesh and possibly a rigid body for the environment. 
-    /**Mainly used to create the race track rigid mesh and rigid bodies but also used to create a skybox mesh.
-    */
+    /// Creates a mesh and possibly a rigid body for the environment. 
+    /// Mainly used to create the race track rigid mesh and rigid bodies but also used to create a skybox mesh.
+    
     void create_track_component(mat4t_in track_size, mesh *msh, material *mtl, bool is_rigid_body){
 
       scene_node *track_nodes = new scene_node();
@@ -85,6 +84,7 @@ namespace octet {
             modelToWorld.loadIdentity();
             track_mat = new material(new image("assets/deadend.jpg"));
           }
+          //if a comma, add the track variable to the parameters array
           if (c == 44){
             track_variable.push_back('\0'); //null terminate the buffer
             //parse char string to double and assign it to a float

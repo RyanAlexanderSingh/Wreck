@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wreck_5fgame',['wreck_game',['../classoctet_1_1wreck__game.html#a3415715222482226f53af7aacc322086',1,'octet::wreck_game']]]
+  ['xbox_5fcontroller',['xbox_controller',['../classoctet_1_1xbox__controller.html#a23dae5b93d48b45fee3d992b1afed77b',1,'octet::xbox_controller']]]
 ];

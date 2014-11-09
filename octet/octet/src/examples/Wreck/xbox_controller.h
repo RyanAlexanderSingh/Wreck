@@ -56,11 +56,11 @@ namespace octet {
       return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
-    ///returns whether or not the analog values are within thumbpad deadzone 
-    bool analog_deadzone(float analog_stick_x, float analog_stick_y){
+    ///returns whether or not the analog values are in the deadzone
+    bool analog_deadzone(){
 
-      float check_analog_x = analog_stick_x;
-      float check_analog_y = analog_stick_y;
+      float check_analog_x = (float)controller_state.Gamepad.sThumbLX;
+      float check_analog_y = (float)controller_state.Gamepad.sThumbLY;
 
       //left and right analog deadzone are the same, so we can just check against the left one, it makes no difference.
       //if the x axis is not in the deadzone, return false
@@ -79,19 +79,6 @@ namespace octet {
       }
     }
 
-    ///return whether or not a trigger has been pressed, returns true if left or right has been pressed.
-    bool trigger_pressed(){
-      BYTE r_trigger_press = controller_state.Gamepad.bRightTrigger;
-      BYTE l_trigger_press = controller_state.Gamepad.bLeftTrigger;
-
-      if (r_trigger_press || l_trigger_press > XINPUT_GAMEPAD_TRIGGER_THRESHOLD){
-        return true;
-      }
-      else{
-        return false;
-      }
-    }
-
     ///check to see if a device is connected and updates values accordingly, returns false if device is not connected, equivalent to an update function.
     bool refresh(){
       if (controller_index == -1){
@@ -107,7 +94,7 @@ namespace octet {
         }
 
         //check to see if the left analog stick is in the deadzone
-        if (!analog_deadzone((float)controller_state.Gamepad.sThumbLX, (float)controller_state.Gamepad.sThumbLY)){
+        if (!analog_deadzone()){
           left_analog_x = map_values((float)controller_state.Gamepad.sThumbLX, -32768, 32768, -0.261799f, 0.261799f);
         }
         left_trigger = map_values((float)controller_state.Gamepad.bLeftTrigger, 0.0f, 255.0f, 0.0f, 20.0f);

@@ -1,11 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2014
+// Ryan Singh 2014
 //
-// Modular Framework for OpenGLES2 rendering on multiple platforms.
+// wreck_game.h - main header file for init the race track and vehicle classes
 //
 namespace octet {
-  /// Scene using bullet for physics effects.
+  ///Scene using bullet physics to create a vehicle without using raycast vehicle.
+  ///The scene produces a vehicle from rigid bodies and attached using hinge constraints: vehicle.h.
+  ///A sample race_track is provided which is read in from a text file: race_track.h.
+  ///The inputs are default to keyboard but an xbox controller can be read (better control on xbox controller): xbox_controller.h.
   class wreck_game : public app {
 
     race_track race_track;
@@ -20,10 +23,7 @@ namespace octet {
     btSequentialImpulseConstraintSolver *solver; /// handler to resolve collisions
     btDiscreteDynamicsWorld *world; /// physics world, contains rigid bodies
 
-    dynarray<btRigidBody*> rigid_bodies;
-    dynarray<scene_node*> nodes;
-
-    vec3 camAngle = (0.0f, 0.0f, 0.0f);
+    vec2 camAngle = (0.0f, 0.0f); //vec2 to store x and y pos of camera angle.
 
     ///this function is responsible for moving the camera based on mouse position
     void move_camera(int x, int y, HWND *w)
@@ -31,7 +31,6 @@ namespace octet {
       static bool is_mouse_moving = true;
 
       if (is_mouse_moving){
-
         int vx, vy;
         get_viewport_size(vx, vy);
         float dx = x - vx * 0.5f;
@@ -86,12 +85,12 @@ namespace octet {
       app_scene->get_camera_instance(0)->set_near_plane(1);
       app_scene->get_camera_instance(0)->set_far_plane(2000);
       app_scene->get_camera_instance(0)->get_node()->access_nodeToParent().translate(0.0f, 3.0f, 20.0f);
-      
+
       //create the race track
       race_track.init(this, *&app_scene, *&world);
 
       //create the car
-      vehicle_instance.init(this, *&app_scene, *&world); 
+      vehicle_instance.init(this, *&app_scene, *&world);
     }
 
     /// this is called to draw the world
@@ -117,12 +116,14 @@ namespace octet {
             mat4t &cameraMatrix = cameraNode->access_nodeToParent();
             cameraNode->loadIdentity();
             cameraMatrix.translate(-30, 14, 0);
-            //default positions - facing camera
-            cameraMatrix.rotateY(270.0f);
-            cameraMatrix.rotateX(-20);
-            if (is_key_down('X')){
+            if (is_key_down('X')){ //allow a free rotating camera 
               cameraMatrix.rotateY(camAngle.x());
               cameraMatrix.rotateX(camAngle.y() - 30);
+            }
+            //default positions - static camera facing vehicle
+            else{
+              cameraMatrix.rotateY(270.0f);
+              cameraMatrix.rotateX(-20);
             }
           }
           mat4t &mat = vehicle_nodes->access_nodeToParent();

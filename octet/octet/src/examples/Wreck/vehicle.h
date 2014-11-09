@@ -7,17 +7,16 @@
 
 namespace octet {
 
-  ///Class to create a vehicle using hinge constraints
-  /** Class will create a vehicle out of rigid bodies. The vehicle consists of a chassis, 4 axils and 4 wheels.
-      They are attached using hinge constraints. There are 2 hinge constraint relationships, Chassis-Axils and Axils-Wheels.
-  */
+  ///Class to create a vehicle using hinge constraints.
+  ///Class will create a vehicle out of rigid bodies. The vehicle consists of a chassis, 4 axils and 4 wheels.
+  ///They are attached using hinge constraints. There are 2 hinge constraint relationships, Chassis-Axils and Axils-Wheels.
   class vehicle : public resource {
 
     xbox_controller xbox_controller;
 
     app *the_app;
     visual_scene *app_scene;
-    btDiscreteDynamicsWorld *the_world; 
+    btDiscreteDynamicsWorld *the_world;
 
     dynarray<btRigidBody*> vehicles; //only one in array - should change
     dynarray<btRigidBody*> axils; //axil array - used to connect hinges and activate physics when movement occurs
@@ -35,7 +34,7 @@ namespace octet {
     unsigned cur_source;
     ALuint sources[8];
     ALuint get_sound_source() { return sources[cur_source++ % 8]; }
-    
+
   public:
 
     vehicle()
@@ -63,9 +62,8 @@ namespace octet {
     }
 
     ///Creates the hinge constraints between two rigid bodies. 
-    /** Function takes in two rigid bodies, the hinge constraint it should be pushed back into, the pivots of the objects(position in local space to connect constraint),
-    the axis in which the hinge constraint has freedom and a bool to check whether or not hinge limits should be applied. Hinge limits only applicable for Chassis-Axil hinge for rotation.
-    */
+    /// Function takes in two rigid bodies, the hinge constraint it should be pushed back into, the pivots of the objects(position in local space to connect constraint),
+    ///the axis in which the hinge constraint has freedom and a bool to check whether or not hinge limits should be applied. Hinge limits only applicable for Chassis-Axil hinge for rotation.
     void create_hinges(btRigidBody *rbA, btRigidBody *rbB, dynarray <btHingeConstraint*> *hinge_array, vec3_in PivotA, vec3_in PivotB, vec3_in Axis, bool set_hinge_limits){
 
       btVector3 btPivotA = get_btVector3(PivotA); //btVector3 of first rigid body pivot
@@ -81,9 +79,9 @@ namespace octet {
     }
 
     ///Function to play sound when the vehicle is moving. 
-    /**sound_control gets the source state of selected source and returns it state
-      if a sound file is not playing and the motor_velocity(movement) is != 0.0 then play a sound file.
-    */
+    /// sound_control gets the source state of selected source and returns it state
+    /// if a sound file is not playing and the motor_velocity(movement) is != 0.0 then play a sound file.
+
     void sound_control(){
 
       unsigned source_state; //state of the selected source
@@ -103,10 +101,9 @@ namespace octet {
         alSourceStop(source);
       }
     }
-    
-    //Init the vehicle by creating the rigid bodies and attaching the hinge constraints
-    /** Creates the meshes and rigid bodies for the chassis, 4 axils and 4 wheels. Creates the hinge constraints for each of these rigid bodies.
-    */
+
+    /// Init the vehicle by creating the rigid bodies and attaching the hinge constraints.
+    /// Creates the meshes and rigid bodies for the chassis, 4 axils and 4 wheels. Creates the hinge constraints for each of these rigid bodies.
     void init(app *app, visual_scene *app_scene, btDiscreteDynamicsWorld *world){
       this->the_app = app;
       this->app_scene = app_scene;
@@ -122,6 +119,7 @@ namespace octet {
       material *wheel_mat = new material(new image("assets/tire.jpg"));
       material *red = new material(vec4(1, 0, 0, 1));
 
+      //create 4 wheels and 4 axils
       for (float i = 0.0f; i != 4; ++i){
         modelToWorld.translate(i, 0.0f, 0.0f);
         create_car_component(modelToWorld, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 1.0f, 0.5f)), wheel_mat, &wheels, 5.0f);
@@ -149,9 +147,9 @@ namespace octet {
     }
 
     ///Update the vehicle class every frame, called from the main app wreck_game. 
-    ///Update takes care of the keyboard inputs and checks if an xbox controller has been connected.
+    /// Update takes care of the keyboard inputs and checks if an xbox controller has been connected.
     ///Keyboard inputs and the Xbox controller will not work together and keyboard inputs are taken as default. 
-    ///If an Xbox controller is found then the inputs from the xbox controller are taken instead.
+    /// If an Xbox controller is found then the inputs from the xbox controller are taken instead. 
     void update(){
 
       const float step_acceleration = 0.4f; //float to increment motor_velocity
@@ -169,12 +167,20 @@ namespace octet {
         }
       }
 
-      if (the_app->is_key_down('D') || the_app->is_key_down(key_right)) {
+      else if (the_app->is_key_down('D') || the_app->is_key_down(key_right)) {
         if (axil_direction_limit < (max_angle * 3.14159265f / 180.0f)){
           axil_direction_limit += step_angle * 3.14159265f / 180.0f;
           rotate_axils(axil_direction_limit);
         }
       }
+
+      else if (!the_app->is_key_down('A') || !the_app->is_key_down('D') || the_app->is_key_down(key_left) || the_app->is_key_down(key_right)){
+        if (axil_direction_limit != 0){
+          axil_direction_limit = 0.0f;
+          rotate_axils(axil_direction_limit);
+        }
+      }
+
 
       //moving the car forwards
       if (the_app->is_key_down('W') || the_app->is_key_down(key_up)){
@@ -191,13 +197,13 @@ namespace octet {
       }
 
       //if no force is being applied - setting motor_velocity to 0 will produce a fake form of friction
-      else if (!the_app->is_key_down('W') || !the_app->is_key_down('S')){
+      else if (!the_app->is_key_down('W') || !the_app->is_key_down('S') || the_app->is_key_down(key_up) || the_app->is_key_down(key_down)){
         if (motor_velocity != 0){
           motor_velocity = 0.0f;
         }
       }
 
-      move_direction(motor_velocity, 10);
+      move_direction(motor_velocity, 10); //apply the motor_velocity
 
       //if the xbox controller has been connected
       if (xbox_controller.refresh()){
@@ -205,7 +211,12 @@ namespace octet {
         motor_velocity = xbox_controller.right_trigger - xbox_controller.left_trigger;
         move_direction(motor_velocity, 10);
         //turn wheels based on x pos of left analog stick
-        rotate_axils(xbox_controller.left_analog_x);
+        if (!xbox_controller.analog_deadzone()){
+          rotate_axils(xbox_controller.left_analog_x);
+        }
+        else{
+          rotate_axils(0); //set the axils back to it's center point
+        }
       }
 
       sound_control();
@@ -218,8 +229,8 @@ namespace octet {
     }
 
     ///Move the vehicle by setting a velocity on the hinge angular motors. 
-    /** To move the vehicle, all 4 axils are activated and the angular motor on all Axil-Wheel hinge constraints are enabled. 
-    a motor velocity and a maximum impulse is then set to the hinge. */
+    /// To move the vehicle, all 4 axils are activated and the angular motor on all Axil-Wheel hinge constraints are enabled. 
+    /// a motor velocity and a maximum impulse is then set to the hinge. 
     void move_direction(float motor_velocity, float motor_impulse_limit){
       for (int i = 0; i != 4; ++i){
         //optimize bullet simulation - don't want to waste memory on simulating static object
@@ -229,8 +240,8 @@ namespace octet {
     }
 
     ///Function to take in the radian at which to turn the vehicle. 
-    /** The vehicle is turned by activating the front two axils in the scene and applying an angular rotation
-    on the free angle in the Chassis-Axil hinge constraints */
+    /// The vehicle is turned by activating the front two axils in the scene and applying an angular rotation
+    /// on the free angle in the Chassis-Axil hinge constraints 
     void rotate_axils(float axil_direction_limit){
       for (int i = 0; i != 2; ++i){
         //optimize bullet simulation - don't want to waste memory on simulating static object
