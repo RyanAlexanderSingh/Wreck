@@ -126,7 +126,7 @@ namespace octet {
       bitmap_font *font = overlay->get_default_font();
 
       // create a box containing text (in pixels)
-      aabb bb(vec3(-120.5f, -400.0f, 0.0f), vec3(256, 64, 0));
+      aabb bb(vec3(-550.5f, 400.0f, 0.0f), vec3(256, 64, 0));
       text = new mesh_text(font, "", &bb);
 
       // add the mesh to the overlay.
