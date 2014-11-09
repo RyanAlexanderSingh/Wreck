@@ -59,13 +59,14 @@ namespace octet {
       mat4t modelToWorld;
       material *skybox_mat = new material(new image("assets/seamless_sky.jpg"));
       create_track_component(modelToWorld, new mesh_sphere(100.0f, 400.0f, 3), skybox_mat, false);
-
+ 
       dynarray<unsigned char> file; //char array to store the contents of the file
       app_utils::get_url(file, "assets/race_track.txt");
       dynarray<char> track_variable; //stores individual track paramters from the file
       dynarray<float> track_parameters; //stores complete race track paramters - rotation, translation and size
       material *track_mat = new material(new image("assets/road_texture.jpg"));
       //create the roads & barriers
+      printf("reading the race track text file \n");
       for (unsigned i = 0; i != file.size(); ++i){
         unsigned c = file[i];
         //33 in UTF-8 represents an exclaimation mark, our breakpoint for reading the whole file
@@ -98,6 +99,7 @@ namespace octet {
           }
         }
       }
+      printf("finished reading text file");
     }
 
     ~race_track() {

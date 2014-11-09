@@ -125,7 +125,7 @@ namespace octet {
       bitmap_font *font = overlay->get_default_font();
 
       // create a box containing text (in pixels)
-      aabb bb(vec3(120.5f, -400.0f, 0.0f), vec3(256, 64, 0));
+      aabb bb(vec3(-120.5f, -400.0f, 0.0f), vec3(256, 64, 0));
       text = new mesh_text(font, "", &bb);
 
       // add the mesh to the overlay.
@@ -134,11 +134,11 @@ namespace octet {
       mat4t modelToWorld;
       modelToWorld.translate(0.0f, 5.0f, 0.0f);
       vec3 chassis_size(3.0f, 0.125f, 2.0f);
-      create_car_component(modelToWorld, new mesh_box(chassis_size), new material(vec4(1, 0, 1, 1)), &vehicles, 5.0f);
+      create_car_component(modelToWorld, new mesh_box(chassis_size), new material(new image("assets/chassis_texture.jpg")), &vehicles, 5.0f);
 
       vec3 axil_size(0.25f, 0.25f, 0.5f);
 
-      material *wheel_mat = new material(new image("assets/tire_test.jpg"));
+      material *wheel_mat = new material(new image("assets/tire.jpg"));
       material *red = new material(vec4(1, 0, 0, 1));
 
       //create 4 wheels and 4 axils
@@ -180,12 +180,11 @@ namespace octet {
       const float step_angle = 1.5f; //float to increment the angle axils turn
       const float max_angle = 15.0f; //maximum angle the axil can rotate
 
-      // write some text to the overlay
-      char buf[3][256];
+     // write some text to the overlay
 
       text->clear();
 
-      text->format("Press X to rotate camera with mouse position \n" "Sound muted: %s \n", mute ? "true" : "false");
+      text->format("Press X to rotate camera with mouse position \n" "Esc to close the program \n" "M to mute sound - Sound muted: %s \n", mute ? "true" : "false");
 
       // convert it to a mesh.
       text->update();
@@ -253,7 +252,7 @@ namespace octet {
           rotate_axils(0); //set the axils back to it's center point
         }
       }
-
+      //mute sound
       if (the_app->is_key_down('M') && !key_down_last_frame)
       {
         mute = !mute;
